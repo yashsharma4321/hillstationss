@@ -1,0 +1,2223 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Property Portal API",
+        "description": "API documentation for the Property Portal backend",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "User & Vendor Login",
+                "operationId": "222b2625838e3c57e017987f73598fda",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "device_name": {
+                                        "type": "string",
+                                        "default": "web_token"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/api/admin/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Admin Login",
+                "operationId": "288eed9f65eee449896bb9f54a46f188",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    }
+                }
+            }
+        },
+        "/api/user": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get authenticated user details",
+                "operationId": "961ad57987905b44ae2e2f40b82e76de",
+                "responses": {
+                    "200": {
+                        "description": "User details"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout User",
+                "operationId": "ad65cbbd4e9f201619eae184a5961a98",
+                "responses": {
+                    "200": {
+                        "description": "Logged out successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/blogs": {
+            "get": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Get list of active blogs",
+                "operationId": "393feb67e712ffe8052c83b54689ceb0",
+                "responses": {
+                    "200": {
+                        "description": "List of paginated blogs",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/blogs/{slug}": {
+            "get": {
+                "tags": [
+                    "Blogs"
+                ],
+                "summary": "Get single blog by slug",
+                "operationId": "0a0082fa846467f8936aa8bef890a0ee",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detailed blog data"
+                    },
+                    "404": {
+                        "description": "Blog not found"
+                    }
+                }
+            }
+        },
+        "/api/customer/bookings": {
+            "get": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "List logged in customer's bookings",
+                "operationId": "9f6fd58f4ff36b51ad080058c3182714",
+                "responses": {
+                    "200": {
+                        "description": "List of bookings",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Create a new booking",
+                "operationId": "39e1823664d5edf85e0d5f3b24c6e779",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "property_id",
+                                    "check_in",
+                                    "check_out",
+                                    "total_amount"
+                                ],
+                                "properties": {
+                                    "property_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "check_in": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-06-01"
+                                    },
+                                    "check_out": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-06-05"
+                                    },
+                                    "total_amount": {
+                                        "type": "number",
+                                        "example": 5000
+                                    },
+                                    "adults": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "children": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "razorpay_payment_id": {
+                                        "type": "string",
+                                        "example": "pay_29QQoUBi66xm2f"
+                                    },
+                                    "razorpay_order_id": {
+                                        "type": "string",
+                                        "example": "order_9A33XWu170gUtm"
+                                    },
+                                    "razorpay_signature": {
+                                        "type": "string",
+                                        "example": "9efc..."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Booking successful",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/chat/conversations": {
+            "get": {
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "List all conversations",
+                "description": "Returns all users the authenticated user has chatted with, including last message and unread count.",
+                "operationId": "23e348fc1da6e84d35c405c53f4b4220",
+                "responses": {
+                    "200": {
+                        "description": "List of conversations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "conversations": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "user": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 5
+                                                            },
+                                                            "name": {
+                                                                "type": "string",
+                                                                "example": "John Doe"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "john@example.com"
+                                                            },
+                                                            "role": {
+                                                                "type": "string",
+                                                                "example": "customer"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    },
+                                                    "last_message": {
+                                                        "type": "string",
+                                                        "example": "Hello!"
+                                                    },
+                                                    "last_message_time": {
+                                                        "type": "string",
+                                                        "example": "2 minutes ago"
+                                                    },
+                                                    "last_message_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "unread_count": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/chat/messages/{userId}": {
+            "get": {
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "Get messages with a user",
+                "description": "Returns all messages between the authenticated user and the specified user. Also marks incoming messages as read.",
+                "operationId": "282e7513321832da97bd75115d4993c9",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "description": "ID of the user to fetch messages with",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Messages fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "with_user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "John Doe"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "john@example.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "customer"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "messages": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 101
+                                                    },
+                                                    "message": {
+                                                        "type": "string",
+                                                        "example": "Hello there!"
+                                                    },
+                                                    "sender_id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "is_mine": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "is_read": {
+                                                        "type": "boolean",
+                                                        "example": false
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "time": {
+                                                        "type": "string",
+                                                        "example": "10:45 AM"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "example": "2024-05-31"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/chat/send": {
+            "post": {
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "Send a message",
+                "description": "Send a message to another user. Also broadcasts a real-time WebSocket event to the receiver.",
+                "operationId": "cb796b4b9626a6b3f7b423542f6e2907",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "receiver_id",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "receiver_id": {
+                                        "description": "ID of the message recipient",
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "message": {
+                                        "description": "Message content (max 2000 chars)",
+                                        "type": "string",
+                                        "example": "Hello there!"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Message sent successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 101
+                                                },
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Hello there!"
+                                                },
+                                                "sender_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "receiver_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "is_mine": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "is_read": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "time": {
+                                                    "type": "string",
+                                                    "example": "10:45 AM"
+                                                },
+                                                "date": {
+                                                    "type": "string",
+                                                    "example": "2024-05-31"
+                                                },
+                                                "sender": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Admin User"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/chat/typing": {
+            "post": {
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "Broadcast typing indicator",
+                "description": "Fires a real-time WebSocket event so the receiver sees a \"User is typing...\" indicator.",
+                "operationId": "842bee7d137a6335695c6e030b1c4ec1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "receiver_id"
+                                ],
+                                "properties": {
+                                    "receiver_id": {
+                                        "description": "ID of the user who will see the typing indicator",
+                                        "type": "integer",
+                                        "example": 5
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Typing event broadcasted",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/chat/unread-count": {
+            "get": {
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "Get total unread message count",
+                "description": "Returns the total number of unread messages for the authenticated user across all conversations.",
+                "operationId": "1bf27cb0be8ed59dfe1f49b979e23d4b",
+                "responses": {
+                    "200": {
+                        "description": "Unread message count",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "count": {
+                                            "type": "integer",
+                                            "example": 7
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/chat/messages/{messageId}": {
+            "delete": {
+                "tags": [
+                    "Chat"
+                ],
+                "summary": "Delete a message",
+                "description": "Permanently deletes a message. Only the sender of the message can delete it.",
+                "operationId": "0e1b21c13b748749598cd2e1505b97a2",
+                "parameters": [
+                    {
+                        "name": "messageId",
+                        "in": "path",
+                        "description": "ID of the message to delete",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 101
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Message deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Message deleted successfully."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "404": {
+                        "description": "Message not found or not yours"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/collections": {
+            "get": {
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "Get all property collections",
+                "operationId": "03538309e08de30a7badd2a44ac8c537",
+                "responses": {
+                    "200": {
+                        "description": "List of collections",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/contact": {
+            "post": {
+                "tags": [
+                    "Contact"
+                ],
+                "summary": "Submit contact inquiry",
+                "operationId": "091364660aac946c17e7253400cb3f89",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "full_name",
+                                    "email",
+                                    "phone",
+                                    "message"
+                                ],
+                                "properties": {
+                                    "full_name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "message": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Inquiry submitted successfully"
+                    }
+                }
+            }
+        },
+        "/api/coupons": {
+            "get": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Get all active global coupons",
+                "operationId": "103ba89cc38df5f1520dae3181954501",
+                "responses": {
+                    "200": {
+                        "description": "List of active global coupons",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/coupons/apply": {
+            "post": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Validate a coupon code and get its details",
+                "operationId": "6dbf651a1753b3cdabc3a68d38908017",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "code": {
+                                        "type": "string",
+                                        "example": "SAVE10"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Coupon details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/customer/coupons": {
+            "get": {
+                "tags": [
+                    "Coupons"
+                ],
+                "summary": "Get all coupons available to the logged-in user",
+                "operationId": "91b3c4ee9595a2d9ba516d547e002d08",
+                "responses": {
+                    "200": {
+                        "description": "List of available coupons",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/customer/send-otp": {
+            "post": {
+                "tags": [
+                    "Customer Auth"
+                ],
+                "summary": "Send OTP to email for login/register",
+                "operationId": "6abc944f2247c6f3384982218c3a2770",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OTP sent successfully"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
+        "/api/customer/verify-otp": {
+            "post": {
+                "tags": [
+                    "Customer Auth"
+                ],
+                "summary": "Verify OTP and login/register customer",
+                "operationId": "779c55104d287545bd5efc4bcb4b72e8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "otp": {
+                                        "type": "string",
+                                        "example": "123456"
+                                    },
+                                    "device_name": {
+                                        "type": "string",
+                                        "example": "mobile"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Logged in / registered successfully"
+                    },
+                    "422": {
+                        "description": "Invalid or expired OTP"
+                    }
+                }
+            }
+        },
+        "/api/customer/google": {
+            "post": {
+                "tags": [
+                    "Customer Auth"
+                ],
+                "summary": "Login or register with Google",
+                "operationId": "d33d2030a44d35d92972efc6805750d5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "id_token": {
+                                        "description": "Google ID token from frontend",
+                                        "type": "string"
+                                    },
+                                    "device_name": {
+                                        "type": "string",
+                                        "example": "mobile"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Logged in / registered successfully"
+                    },
+                    "401": {
+                        "description": "Invalid Google token"
+                    }
+                }
+            }
+        },
+        "/api/customer/profile": {
+            "get": {
+                "tags": [
+                    "Customer Auth"
+                ],
+                "summary": "Get authenticated customer profile",
+                "operationId": "29e68b8da0d4defef6ea3313fe5f2074",
+                "responses": {
+                    "200": {
+                        "description": "Customer profile"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Customer Auth"
+                ],
+                "summary": "Update customer profile",
+                "operationId": "71d7078791a0f5a01456882f81663e1a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+919876543210"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profile updated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/customer/logout": {
+            "post": {
+                "tags": [
+                    "Customer Auth"
+                ],
+                "summary": "Logout customer",
+                "operationId": "580db03942981af1f25fb5297f6bb701",
+                "responses": {
+                    "200": {
+                        "description": "Logged out"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/discovery/best-rates": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get best rates villas grouped by state and destination",
+                "operationId": "4483b09a45b482eec4b8091bf7ef4b59",
+                "responses": {
+                    "200": {
+                        "description": "List of states with destinations and their top villas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/discovery/for-you": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get 'Properties for You' villas grouped by BHK",
+                "operationId": "ec5336c690a98e938339f2f8f5a6f879",
+                "responses": {
+                    "200": {
+                        "description": "List of properties grouped by BHK count",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/discovery/menu-destinations": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get destinations marked to be shown in menu grouped by state",
+                "operationId": "1b70c6f8968527d8a5cc27a99bb54f8a",
+                "responses": {
+                    "200": {
+                        "description": "List of states with menu destinations",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/discovery/destination-properties": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get properties for a specific destination marked for menu",
+                "operationId": "e6033f65be1a408a5745dbe9658ab1e9",
+                "parameters": [
+                    {
+                        "name": "destination_slug",
+                        "in": "query",
+                        "description": "The slug of the destination",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of properties for the destination",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/discovery/menu-categories": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get categories marked to be shown in menu",
+                "operationId": "7a1293b7dda2c94b400327963ec779e8",
+                "responses": {
+                    "200": {
+                        "description": "List of menu categories",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/discovery/category-properties": {
+            "get": {
+                "tags": [
+                    "Discovery"
+                ],
+                "summary": "Get properties for a specific category marked for menu",
+                "operationId": "2520ef6021a880302c7f553038131f23",
+                "parameters": [
+                    {
+                        "name": "category_slug",
+                        "in": "query",
+                        "description": "The slug of the category",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of properties for the category",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pages": {
+            "get": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Get list of pages",
+                "operationId": "374d995436029ca3d249e45ee40dcd70",
+                "responses": {
+                    "200": {
+                        "description": "List of pages",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "title": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    },
+                                                    "banner_image": {
+                                                        "type": "string"
+                                                    },
+                                                    "banner_alt_text": {
+                                                        "type": "string"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/pages/{slug}": {
+            "get": {
+                "tags": [
+                    "Pages"
+                ],
+                "summary": "Get single page details by slug",
+                "operationId": "277f0727c842cd7383cf425c757ccad8",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Page details containing structured blocks"
+                    },
+                    "404": {
+                        "description": "Page not found"
+                    }
+                }
+            }
+        },
+        "/api/properties": {
+            "get": {
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "List all active properties with filters",
+                "operationId": "e83a7fc5b1d98569892c10b7b0223879",
+                "parameters": [
+                    {
+                        "name": "destination",
+                        "in": "query",
+                        "description": "Destination slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "description": "State slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "collection",
+                        "in": "query",
+                        "description": "Collection slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "description": "Category slug",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "check_in",
+                        "in": "query",
+                        "description": "Format: YYYY-MM-DD",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "check_out",
+                        "in": "query",
+                        "description": "Format: YYYY-MM-DD",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "guests",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "rooms_requested",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "lat",
+                        "in": "query",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "lng",
+                        "in": "query",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "description": "Radius in km (default 50)",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        }
+                    },
+                    {
+                        "name": "bedrooms",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of properties with full details",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/properties/{slug}": {
+            "get": {
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "Get single property details by slug",
+                "operationId": "3b9a5917561a9d6e3c3260bfff324ed5",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "The slug of the property",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Detailed property information",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/properties/{slug}/related": {
+            "get": {
+                "tags": [
+                    "Properties"
+                ],
+                "summary": "Get related properties by slug",
+                "operationId": "e8449de6a3cbe2cba9776b57409d8255",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "description": "The slug of the property",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of related properties",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/properties/{slug}/reviews": {
+            "get": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Get reviews for a property",
+                "operationId": "db914b4ab9cb71f433152d3896bf3a13",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of reviews for the property",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/customer/reviews": {
+            "post": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Submit a review for a booking",
+                "operationId": "faeca7cb1858950e575451fd5d97670e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "booking_id",
+                                    "ratings",
+                                    "comment"
+                                ],
+                                "properties": {
+                                    "booking_id": {
+                                        "type": "string",
+                                        "example": "BK-0982"
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "Amazing stay! Loved the view."
+                                    },
+                                    "ratings": {
+                                        "properties": {
+                                            "amenities": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "cleanliness": {
+                                                "type": "integer",
+                                                "example": 4
+                                            },
+                                            "communication": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "location": {
+                                                "type": "integer",
+                                                "example": 4
+                                            },
+                                            "value": {
+                                                "type": "integer",
+                                                "example": 5
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Review submitted"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/customer/reviews/{id}": {
+            "put": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Update your review",
+                "operationId": "e0d96c05f2be0a1aa7ea6c424efe6e1f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "rating": {
+                                        "type": "integer",
+                                        "example": 4
+                                    },
+                                    "comment": {
+                                        "type": "string",
+                                        "example": "Updated review"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Review updated"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Reviews"
+                ],
+                "summary": "Delete your review",
+                "operationId": "c923cb491d7a99a9b8da7400de7e48a9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Review deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/settings": {
+            "get": {
+                "tags": [
+                    "Settings"
+                ],
+                "summary": "Get all global application settings",
+                "operationId": "39919ed520029d628c8b91c83fc87e06",
+                "responses": {
+                    "200": {
+                        "description": "Key-value pair object of the global settings.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": {
+                                                "email": "info@example.com",
+                                                "phone": "+1234567890",
+                                                "address": "123 Street City",
+                                                "footer_short_content": "We are the best company in the world providing top tier services.",
+                                                "commission_percentage": "10.00",
+                                                "logo": "http://localhost/storage/settings/logo.png",
+                                                "favicon": "http://localhost/storage/settings/favicon.ico",
+                                                "header_script": "<!-- script -->",
+                                                "footer_script": ""
+                                            },
+                                            "additionalProperties": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/vendor-registration/setup": {
+            "get": {
+                "tags": [
+                    "Vendor Registration"
+                ],
+                "summary": "Get necessary data for vendor registration wizard",
+                "operationId": "55979581954482285b9abf6bb46c8a9c",
+                "responses": {
+                    "200": {
+                        "description": "Registration setup data (categories, amenities, destinations)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/vendor-registration/submit": {
+            "post": {
+                "tags": [
+                    "Vendor Registration"
+                ],
+                "summary": "Submit multi-step vendor and property registration",
+                "operationId": "a333b4a733519a6bafc526caf3217fd4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "phone": {
+                                        "type": "string"
+                                    },
+                                    "business_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "property_name": {
+                                        "type": "string"
+                                    },
+                                    "property_amount": {
+                                        "description": "Base amount/price for the property",
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
+                                    "vendor_amount": {
+                                        "description": "Vendor's set fee/amount",
+                                        "type": "number",
+                                        "format": "float",
+                                        "nullable": true
+                                    },
+                                    "category_id": {
+                                        "type": "integer"
+                                    },
+                                    "destination_id": {
+                                        "type": "integer"
+                                    },
+                                    "total_bedrooms": {
+                                        "type": "integer"
+                                    },
+                                    "address": {
+                                        "type": "string"
+                                    },
+                                    "city": {
+                                        "type": "string"
+                                    },
+                                    "state": {
+                                        "type": "string"
+                                    },
+                                    "zip_code": {
+                                        "type": "string"
+                                    },
+                                    "amenities": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registration submitted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/customer/wishlist": {
+            "get": {
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "Get customer's wishlist",
+                "operationId": "e11ed3f51624727500e7fc2a96c095dc",
+                "responses": {
+                    "200": {
+                        "description": "List of wishlisted properties",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "Add property to wishlist (toggle)",
+                "operationId": "61c6d6bcf59f1125f0b57a0974accf2a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "property_id"
+                                ],
+                                "properties": {
+                                    "property_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Wishlist toggled"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/customer/wishlist/{id}": {
+            "delete": {
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "Remove property from wishlist",
+                "operationId": "21a6aaaf8e0da554f6b6f798ceb59aba",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Wishlist entry ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Removed from wishlist"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/customer/wishlist/check/{property_id}": {
+            "get": {
+                "tags": [
+                    "Wishlist"
+                ],
+                "summary": "Check if property is wishlisted",
+                "operationId": "89dfc131269cdcef3945fe3033285c86",
+                "parameters": [
+                    {
+                        "name": "property_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Wishlist status"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Blogs",
+            "description": "Blogs"
+        },
+        {
+            "name": "Bookings",
+            "description": "Bookings"
+        },
+        {
+            "name": "Chat",
+            "description": "Chat"
+        },
+        {
+            "name": "Collections",
+            "description": "Collections"
+        },
+        {
+            "name": "Contact",
+            "description": "Contact"
+        },
+        {
+            "name": "Coupons",
+            "description": "Coupons"
+        },
+        {
+            "name": "Customer Auth",
+            "description": "Customer Auth"
+        },
+        {
+            "name": "Discovery",
+            "description": "Discovery"
+        },
+        {
+            "name": "Pages",
+            "description": "Pages"
+        },
+        {
+            "name": "Properties",
+            "description": "Properties"
+        },
+        {
+            "name": "Reviews",
+            "description": "Reviews"
+        },
+        {
+            "name": "Settings",
+            "description": "Settings"
+        },
+        {
+            "name": "Vendor Registration",
+            "description": "Vendor Registration"
+        },
+        {
+            "name": "Wishlist",
+            "description": "Wishlist"
+        }
+    ]
+}
