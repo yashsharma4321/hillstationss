@@ -225,13 +225,14 @@ class PropertyController extends Controller
 
         // Fetch Booked Dates
         $bookedDates = [];
-        $propertyBookings = \App\Models\PropertyBooking::where('property_id', $property->id)
-            ->whereIn('status', ['confirmed', 'booked'])
-            
+        $propertyBookings = \App\Models\Booking::where('property_id', $property->id)
+            ->where('status', '!=', 'cancelled')
             ->get();
 
         foreach ($propertyBookings as $pb) {
-            $period = \Carbon\CarbonPeriod::create($pb->check_in, $pb->check_out);
+            $checkIn = \Carbon\Carbon::parse($pb->check_in);
+            $checkOut = \Carbon\Carbon::parse($pb->check_out);
+            $period = \Carbon\CarbonPeriod::create($checkIn, $checkOut);
             foreach ($period as $date) {
                 $bookedDates[] = $date->format('Y-m-d');
             }

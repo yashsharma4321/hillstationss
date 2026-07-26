@@ -49,6 +49,11 @@ class BookingController extends Controller
             $query->where('status', $request->status);
         }
 
+        // Filter by Property
+        if ($request->filled('property_id')) {
+            $query->where('property_id', $request->property_id);
+        }
+
         // Filter by date range (check_in)
         if ($request->filled('date_from')) {
             $query->whereDate('check_in', '>=', $request->date_from);

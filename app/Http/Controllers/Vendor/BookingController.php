@@ -9,14 +9,25 @@ use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $vendor = Auth::user()->vendor;
-        $bookings = Booking::with(['customer', 'property'])
-            ->where('vendor_id', $vendor->id)
-            ->latest()
-            ->paginate(15);
+        
+        $query = Booking::with(['customer', 'property'])
+            ->where('vendor_id', $vendor->id);
+
+        if ($request->filled('property_id')) {
+            $query->where('property_id', $request->property_id);
+        }
+
+        $bookings = $query->latest()
+            ->paginate(15)
+            ->withQueryString();
+
+        $properties = \App\Models\Property::where('vendor_id', $vendor->id)
+            ->orderBy('name')
+            ->get();
             
-        return view('vendor.bookings.index', compact('bookings'));
+        return view('vendor.bookings.index', compact('bookings', 'properties'));
     }
 }

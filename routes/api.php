@@ -105,6 +105,43 @@ Route::get('/properties', [\App\Http\Controllers\Api\PropertyController::class, 
 Route::get('/properties/{slug}', [\App\Http\Controllers\Api\PropertyController::class, 'show']);
 Route::get('/properties/{slug}/related', [\App\Http\Controllers\Api\PropertyController::class, 'related']);
 Route::get('/properties/{slug}/reviews', [\App\Http\Controllers\Api\ReviewController::class, 'index']);
+
+// Booked dates by property ID — returns each date with customer info for hover tooltips
+Route::get('/properties/{id}/booked-dates', function ($id) {
+    $bookings = \App\Models\Booking::with('customer')
+        ->where('property_id', $id)
+        ->where('status', '!=', 'cancelled')
+        ->get();
+
+    $dateMap = []; // date => [{ name, booking_number, check_in, check_out, status }]
+
+    foreach ($bookings as $bk) {
+        $checkIn = \Carbon\Carbon::parse($bk->check_in);
+        $checkOut = \Carbon\Carbon::parse($bk->check_out);
+        $period = \Carbon\CarbonPeriod::create($checkIn, $checkOut);
+        foreach ($period as $date) {
+            $d = $date->format('Y-m-d');
+            if (!isset($dateMap[$d])) $dateMap[$d] = [];
+            
+            $name = $bk->customer->name ?? 'Guest';
+            $bookingNumber = $bk->booking_number ?? 'N/A';
+
+            $dateMap[$d][] = [
+                'name'           => $name,
+                'booking_number' => $bookingNumber,
+                'check_in'       => $checkIn->format('d M Y'),
+                'check_out'      => $checkOut->format('d M Y'),
+                'status'         => $bk->status,
+            ];
+        }
+    }
+
+    return response()->json([
+        'status'       => 'success',
+        'booked_dates' => array_keys($dateMap),
+        'date_info'    => $dateMap,
+    ]);
+});
 Route::get('collections', [\App\Http\Controllers\Api\CollectionController::class, 'index']);
 Route::get('vendor-registration/setup', [\App\Http\Controllers\Api\VendorRegisterController::class, 'setup']);
 Route::post('vendor-registration/submit', [\App\Http\Controllers\Api\VendorRegisterController::class, 'submit']);
