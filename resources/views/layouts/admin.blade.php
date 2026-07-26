@@ -337,6 +337,8 @@
             box-shadow: 0 4px 6px rgba(73, 166, 140, 0.2);
         }
 
+        .page-item.disabled .page-link { background: #f8fafc; color: #cbd5e1; cursor: not-allowed; }
+
         @media (max-width: 1024px) {
             aside {
                 width: 90px;

@@ -50,9 +50,28 @@ class VendorController extends Controller
             'status' => 'required|in:active,inactive',
             'kyc_status' => 'required|in:pending,approved,rejected',
             'is_approved' => 'required|boolean',
+            'bank_name' => 'nullable|string|max:255',
+            'account_number' => 'nullable|string|max:255',
+            'ifsc_code' => 'nullable|string|max:255',
+            'upi_id' => 'nullable|string|max:255',
         ]);
 
-        $vendor->update($request->all());
+        $vendor->update($request->except(['bank_name', 'account_number', 'ifsc_code', 'upi_id']));
+
+        // Update Bank Details
+        $bankDetails = $vendor->bankDetail;
+        if (!$bankDetails) {
+            $bankDetails = new \App\Models\VendorBankDetail();
+            $bankDetails->vendor_id = $vendor->id;
+        }
+
+        if ($request->filled('bank_name') || $request->filled('account_number') || $request->filled('ifsc_code') || $request->filled('upi_id')) {
+            $bankDetails->bank_name = $request->bank_name;
+            $bankDetails->account_number = $request->account_number;
+            $bankDetails->ifsc_code = $request->ifsc_code;
+            $bankDetails->upi_id = $request->upi_id;
+            $bankDetails->save();
+        }
 
         return redirect()->route('admin.vendors.index')->with('success', 'Vendor updated successfully.');
     }

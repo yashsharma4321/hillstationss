@@ -190,6 +190,11 @@
         .badge-success { background: #dcfce7; color: #166534; }
         .badge-pending { background: #fef9c3; color: #854d0e; }
         .badge-info { background: #e0f2fe; color: #075985; }
+        /* Pagination */
+        .pagination { display: flex; list-style: none; gap: 0.5rem; margin-top: 3rem; justify-content: center; }
+        .page-link { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: white; border: 1px solid var(--border); color: var(--text-main); text-decoration: none; transition: all 0.3s; }
+        .page-item.active .page-link { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 6px rgba(73, 166, 140, 0.2); }
+        .page-item.disabled .page-link { background: #f8fafc; color: #cbd5e1; cursor: not-allowed; }
     </style>
     @yield('styles')
 </head>
@@ -215,7 +220,7 @@
                         <span id="vendorUnreadBadge" class="unread-badge" style="display: none;"></span>
                     </a>
                 </li>
-                <li><a href="#">⚙️ Settings</a></li>
+                <li><a href="{{ route('vendor.profile') }}" class="{{ request()->is('vendor/profile*') ? 'active' : '' }}">👤 Profile</a></li>
             </ul>
         </nav>
         <div style="padding: 1.5rem;">

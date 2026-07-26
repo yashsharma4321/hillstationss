@@ -140,8 +140,21 @@
                 <div style="padding-top: 1rem; border-top: 1px solid #1e293b;">
                     <span style="display: block; font-size: 0.8125rem; color: #94a3b8; margin-bottom: 0.25rem;">Bank Account</span>
                     @if($vendor->bankDetail)
-                        <span style="font-weight: 600; display: block;">{{ $vendor->bankDetail->bank_name }}</span>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">**** **** {{ substr($vendor->bankDetail->account_number, -4) }}</span>
+                        <span style="font-weight: 600; display: block; margin-bottom: 0.25rem;">{{ $vendor->bankDetail->bank_name ?? 'N/A' }}</span>
+                        <div style="font-size: 0.8125rem; color: #cbd5e1; line-height: 1.5;">
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>A/C No:</span>
+                                <span style="font-weight: 600; color: white;">{{ $vendor->bankDetail->account_number ?? 'N/A' }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>IFSC:</span>
+                                <span style="font-weight: 600; color: white;">{{ $vendor->bankDetail->ifsc_code ?? 'N/A' }}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span>UPI:</span>
+                                <span style="font-weight: 600; color: white;">{{ $vendor->bankDetail->upi_id ?? 'N/A' }}</span>
+                            </div>
+                        </div>
                     @else
                         <span style="font-size: 0.75rem; color: #ef4444;">Not set up</span>
                     @endif

@@ -40,6 +40,30 @@
                 </div>
 
                 <div class="full-width" style="grid-column: span 2; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-top: 1rem; margin-bottom: 0.5rem;">
+                    <h3 style="margin: 0; font-size: 1.125rem; font-weight: 600;">Bank Information</h3>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem;">Bank / Account Name</label>
+                    <input type="text" name="bank_name" value="{{ old('bank_name', optional($vendor->bankDetail)->bank_name) }}" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; outline: none;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem;">Account Number</label>
+                    <input type="text" name="account_number" value="{{ old('account_number', optional($vendor->bankDetail)->account_number) }}" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; outline: none;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem;">IFSC Code</label>
+                    <input type="text" name="ifsc_code" value="{{ old('ifsc_code', optional($vendor->bankDetail)->ifsc_code) }}" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; outline: none;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label style="display: block; font-size: 0.875rem; font-weight: 600; color: #475569; margin-bottom: 0.5rem;">UPI ID</label>
+                    <input type="text" name="upi_id" value="{{ old('upi_id', optional($vendor->bankDetail)->upi_id) }}" style="width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; outline: none;">
+                </div>
+
+                <div class="full-width" style="grid-column: span 2; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-top: 1rem; margin-bottom: 0.5rem;">
                     <h3 style="margin: 0; font-size: 1.125rem; font-weight: 600;">Account Settings</h3>
                 </div>
 
