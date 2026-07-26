@@ -225,8 +225,8 @@ class PropertyController extends Controller
         // Fetch Booked Dates
         $bookedDates = [];
         $propertyBookings = \App\Models\PropertyBooking::where('property_id', $property->id)
-            ->where('status', 'booked')
-            ->where('check_out', '>=', now()->toDateString())
+            ->whereIn('status', ['confirmed', 'booked'])
+            
             ->get();
 
         foreach ($propertyBookings as $pb) {
