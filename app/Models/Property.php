@@ -80,4 +80,9 @@ class Property extends Model
     {
         return $this->hasMany(Wishlist::class);
     }
+
+    public function specialDates(): HasMany
+    {
+        return $this->hasMany(PropertySpecialDate::class);
+    }
 }

@@ -665,6 +665,36 @@
         transform: scale(1.05);
     }
 
+    /* Special Date Row */
+    .special-date-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 0.75rem;
+        align-items: flex-end;
+        margin-bottom: 0.75rem;
+        background: #f8fafc;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid #e2e8f0;
+    }
+
+    .special-date-row .btn-remove-sd {
+        background: #fee2e2;
+        color: #dc2626;
+        border: none;
+        border-radius: var(--radius-sm);
+        padding: 0.6rem 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+    }
+
+    .special-date-row .btn-remove-sd:hover {
+        background: #fca5a5;
+        transform: scale(1.05);
+    }
+
     /* File Input Styling */
     input[type="file"] {
         padding: 0.5rem;
@@ -1125,6 +1155,43 @@
         </button>
     </div>
 
+    <!-- SPECIAL DATES (Weekend / Holiday Pricing) -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Special Date Pricing
+        </h3>
+        <p style="color:#64748b; font-size:0.875rem; margin-bottom:1.5rem;">Weekend ya holiday par alag price set karo. Yeh price API mein <code>special_dates</code> field mein ayega.</p>
+
+        <div id="special-dates-container">
+            @php $specialDates = $property->specialDates ?? collect(); @endphp
+            @foreach($specialDates as $index => $sd)
+                <div class="special-date-row">
+                    <div>
+                        <label class="form-label" style="font-size:0.78rem;">Date <span class="required-star">*</span></label>
+                        <input type="date" name="special_dates[{{ $index }}][date]" value="{{ $sd->date->format('Y-m-d') }}" class="form-input" required>
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size:0.78rem;">Amount (₹) <span class="required-star">*</span></label>
+                        <input type="number" name="special_dates[{{ $index }}][amount]" value="{{ $sd->amount }}" class="form-input" min="0" step="0.01" required placeholder="e.g. 15000">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size:0.78rem;">Label</label>
+                        <input type="text" name="special_dates[{{ $index }}][label]" value="{{ $sd->label }}" class="form-input" placeholder="e.g. Weekend, Diwali">
+                    </div>
+                    <button type="button" class="btn-remove-sd" onclick="this.closest('.special-date-row').remove()" title="Remove">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            @endforeach
+        </div>
+
+        <button type="button" class="btn-add" onclick="addSpecialDate()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add Special Date
+        </button>
+    </div>
+
     <!-- IMAGES -->
     <div class="form-section">
         <h3 class="section-title">
@@ -1344,6 +1411,32 @@
         `;
         container.appendChild(card);
         cancelIdx++;
+    }
+
+    let sdIdx = {{ isset($specialDates) ? count($specialDates) : 0 }};
+    function addSpecialDate() {
+        const container = document.getElementById('special-dates-container');
+        const row = document.createElement('div');
+        row.className = 'special-date-row';
+        row.innerHTML = `
+            <div>
+                <label class="form-label" style="font-size:0.78rem;">Date <span class="required-star">*</span></label>
+                <input type="date" name="special_dates[${sdIdx}][date]" class="form-input" required>
+            </div>
+            <div>
+                <label class="form-label" style="font-size:0.78rem;">Amount (₹) <span class="required-star">*</span></label>
+                <input type="number" name="special_dates[${sdIdx}][amount]" class="form-input" min="0" step="0.01" required placeholder="e.g. 15000">
+            </div>
+            <div>
+                <label class="form-label" style="font-size:0.78rem;">Label</label>
+                <input type="text" name="special_dates[${sdIdx}][label]" class="form-input" placeholder="e.g. Weekend, Diwali">
+            </div>
+            <button type="button" class="btn-remove-sd" onclick="this.closest('.special-date-row').remove()" title="Remove">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        `;
+        container.appendChild(row);
+        sdIdx++;
     }
 </script>
 @endsection

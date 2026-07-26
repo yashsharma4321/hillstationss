@@ -35,11 +35,11 @@ class BookingController extends Controller
     )]
     public function index()
     {
-      
+
         $bookings = Booking::where('customer_id', auth()->id())
             ->with([
                 'property' => function ($q) {
-                    $q->select('id', 'name', 'slug', 'city', 'state','gallery');
+                    $q->select('id', 'name', 'slug', 'city', 'state', 'gallery');
                 },
                 'review'
             ])
@@ -150,11 +150,15 @@ class BookingController extends Controller
                 new OA\Property(property: "status", type: "string", example: "success"),
                 new OA\Property(property: "message", type: "string", example: "Booking initiated. Please complete payment."),
                 new OA\Property(property: "booking_id", type: "integer", example: 123),
-                new OA\Property(property: "data", type: "object",
+                new OA\Property(
+                    property: "data",
+                    type: "object",
                     properties: [
                         new OA\Property(property: "id", type: "integer", example: 123),
                         new OA\Property(property: "booking_number", type: "string", example: "BST-ABC123DEF"),
-                        new OA\Property(property: "property", type: "object",
+                        new OA\Property(
+                            property: "property",
+                            type: "object",
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
                                 new OA\Property(property: "name", type: "string", example: "Luxury Villa"),
@@ -231,18 +235,14 @@ class BookingController extends Controller
         $base_amount = $request->subtotal ?? $request->total_amount;
         $discount_amount = $request->discount ?? 0;
         $gst_amount = $request->gst ?? 0;
-        $final_amount = $request->total_amount; 
+        $final_amount = $request->total_amount;
 
         $commission_percentage = $vendor->commission_rate ?? 10;
         $commission_amount = $base_amount * ($commission_percentage / 100);
         $vendor_amount = $base_amount - $commission_amount;
 
         // Create booking with pending payment status (NO accounting/wallet yet)
-        $booking = DB::transaction(function () use (
-            $request, $property, $vendor, $coupon_id,
-            $base_amount, $discount_amount, $gst_amount, $final_amount,
-            $commission_percentage, $commission_amount, $vendor_amount
-        ) {
+        $booking = DB::transaction(function () use ($request, $property, $vendor, $coupon_id, $base_amount, $discount_amount, $gst_amount, $final_amount, $commission_percentage, $commission_amount, $vendor_amount) {
             $booking = Booking::create([
                 'booking_number' => 'BST-' . strtoupper(Str::random(10)),
                 'customer_id' => auth()->id(),
@@ -315,13 +315,17 @@ class BookingController extends Controller
             properties: [
                 new OA\Property(property: "status", type: "string", example: "success"),
                 new OA\Property(property: "message", type: "string", example: "Payment confirmed and booking completed successfully!"),
-                new OA\Property(property: "data", type: "object",
+                new OA\Property(
+                    property: "data",
+                    type: "object",
                     properties: [
                         new OA\Property(property: "id", type: "integer", example: 123),
                         new OA\Property(property: "booking_number", type: "string", example: "BST-ABC123DEF"),
                         new OA\Property(property: "status", type: "string", example: "confirmed"),
                         new OA\Property(property: "payment_status", type: "string", example: "paid"),
-                        new OA\Property(property: "property", type: "object",
+                        new OA\Property(
+                            property: "property",
+                            type: "object",
                             properties: [
                                 new OA\Property(property: "id", type: "integer", example: 1),
                                 new OA\Property(property: "name", type: "string", example: "Luxury Villa")
@@ -329,7 +333,9 @@ class BookingController extends Controller
                         )
                     ]
                 ),
-                new OA\Property(property: "wallet", type: "object",
+                new OA\Property(
+                    property: "wallet",
+                    type: "object",
                     properties: [
                         new OA\Property(property: "vendor_amount_credited", type: "number", example: 4500),
                         new OA\Property(property: "commission_deducted", type: "number", example: 500),
@@ -366,13 +372,13 @@ class BookingController extends Controller
             'razorpay_order_id' => 'required|string',
             'razorpay_signature' => 'required|string',
         ]);
-        
+
         // Find the existing booking
         $booking = Booking::findOrFail($request->booking_id);
-        
+
         // Verify payment signature here (Razorpay verification)
         // Add your Razorpay verification logic
-        
+
         // Check if payment is already processed
         if ($booking->payment_status === 'paid') {
             return response()->json([
@@ -380,9 +386,9 @@ class BookingController extends Controller
                 'message' => 'Payment already processed for this booking.'
             ], 422);
         }
-        
+
         $vendor = $booking->vendor;
-        
+
         DB::transaction(function () use ($request, $booking, $vendor) {
             // Update booking with payment info
             $booking->update([
@@ -392,40 +398,40 @@ class BookingController extends Controller
                 'payment_status' => 'paid',
                 'status' => 'confirmed', // or whatever status you use
             ]);
-            
+
             // Update PropertyBooking status to confirmed
             \App\Models\PropertyBooking::where('booking_id', $booking->id)
                 ->update(['status' => 'confirmed']);
-            
+
             // ── Credit Vendor Wallet (only after successful payment) ──
             if ($booking->vendor_amount > 0) {
                 $wallet = VendorWallet::firstOrCreate(
                     ['vendor_id' => $vendor->id],
                     ['balance' => 0, 'total_earned' => 0]
                 );
-                
+
                 $wallet->increment('balance', $booking->vendor_amount);
                 $wallet->increment('total_earned', $booking->vendor_amount);
                 $wallet->refresh();
-                
+
                 Transaction::create([
-                    'vendor_id'      => $vendor->id,
-                    'amount'         => $booking->vendor_amount,
-                    'type'           => 'credit',
-                    'category'       => 'booking_earning',
-                    'description'    => "Earning from booking #{$booking->booking_number}",
-                    'reference_id'   => $booking->id,
-                    'balance_after'  => $wallet->balance,
+                    'vendor_id' => $vendor->id,
+                    'amount' => $booking->vendor_amount,
+                    'type' => 'credit',
+                    'category' => 'booking_earning',
+                    'description' => "Earning from booking #{$booking->booking_number}",
+                    'reference_id' => $booking->id,
+                    'balance_after' => $wallet->balance,
                 ]);
-                
+
                 \Illuminate\Support\Facades\Log::info("Wallet credited for vendor #{$vendor->id}: +₹{$booking->vendor_amount}, new balance: ₹{$wallet->balance}");
             }
-            
+
             // ── Accounting / Journal Entry (only after successful payment) ──
             $cashHead = \App\Models\AccountHead::where('code', 'A-1002')->first();
             $vendorPayableHead = \App\Models\AccountHead::where('code', 'L-2001')->first();
             $commissionIncomeHead = \App\Models\AccountHead::where('code', 'E-3001')->first();
-            
+
             if ($cashHead && $vendorPayableHead && $commissionIncomeHead) {
                 $journal = \App\Models\JournalEntry::create([
                     'transaction_date' => now(),
@@ -433,34 +439,34 @@ class BookingController extends Controller
                     'reference_id' => $booking->id,
                     'description' => "Booking #{$booking->booking_number} - Payment confirmed",
                 ]);
-                
+
                 // Debit Cash/Bank
                 $journal->lines()->create([
-                    'account_head_id' => $cashHead->id, 
-                    'type' => 'debit', 
+                    'account_head_id' => $cashHead->id,
+                    'type' => 'debit',
                     'amount' => $booking->final_amount
                 ]);
-                
+
                 // Credit Vendor Payable (Liability)
                 if ($booking->vendor_amount > 0) {
                     $journal->lines()->create([
-                        'account_head_id' => $vendorPayableHead->id, 
-                        'type' => 'credit', 
+                        'account_head_id' => $vendorPayableHead->id,
+                        'type' => 'credit',
                         'amount' => $booking->vendor_amount
                     ]);
                 }
-                
+
                 // Credit Commission Income
                 if ($booking->commission_amount > 0) {
                     $journal->lines()->create([
-                        'account_head_id' => $commissionIncomeHead->id, 
-                        'type' => 'credit', 
+                        'account_head_id' => $commissionIncomeHead->id,
+                        'type' => 'credit',
                         'amount' => $booking->commission_amount
                     ]);
                 }
             }
         });
-        
+
         return response()->json([
             'status' => 'success',
             'message' => 'Payment confirmed and booking completed successfully!',

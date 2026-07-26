@@ -58,8 +58,8 @@ Route::post('coupons/apply', [\App\Http\Controllers\Api\CouponController::class,
 Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/v1/instagram-links', [InstagramLinkController::class, 'index']);
-    
-     Route::post('/customer/booking/cancel', [CancellationController::class, 'cancelBooking']);
+
+    Route::post('/customer/booking/cancel', [CancellationController::class, 'cancelBooking']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -133,11 +133,11 @@ Route::prefix('customer')->group(function () {
         Route::post('/logout', [\App\Http\Controllers\Api\CustomerAuthController::class, 'logout']);
 
         // Bookings
-        
+
         Route::get('/bookings', [\App\Http\Controllers\Api\BookingController::class, 'index']);
         Route::post('/bookings', [\App\Http\Controllers\Api\BookingController::class, 'store']);
-        Route::post('/booking-final',[\App\Http\Controllers\Api\BookingController::class, 'bookingfinal']);
-Route::get('/bookings/{id}', [\App\Http\Controllers\Api\BookingController::class, 'show']);
+        Route::post('/booking-final', [\App\Http\Controllers\Api\BookingController::class, 'bookingfinal']);
+        Route::get('/bookings/{id}', [\App\Http\Controllers\Api\BookingController::class, 'show']);
         // Coupons
         Route::get('/coupons', [\App\Http\Controllers\Api\CouponController::class, 'userCoupons']);
 

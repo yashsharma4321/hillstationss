@@ -192,7 +192,8 @@ class PropertyController extends Controller
                 'amenities',
                 'rooms',
                 'vendor.user',
-                'cancellationRules'
+                'cancellationRules',
+                'specialDates',
             ])
             ->first();
 
@@ -264,6 +265,14 @@ class PropertyController extends Controller
                 ];
             }),
             'booked_dates' => $bookedDates,
+            'special_dates' => $property->specialDates
+                ->sortBy('date')
+                ->values()
+                ->map(fn($sd) => [
+                    'date'   => $sd->date->format('Y-m-d'),
+                    'amount' => $sd->amount,
+                    'label'  => $sd->label,
+                ]),
             'category' => [
                 'id' => $property->category->id ?? null,
                 'name' => $property->category->name ?? null,

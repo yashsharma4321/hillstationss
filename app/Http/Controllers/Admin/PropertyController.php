@@ -132,6 +132,19 @@ class PropertyController extends Controller
             $property->collections()->sync($request->collections);
         }
 
+        // Handle Special Dates
+        if ($request->has('special_dates')) {
+            $property->specialDates()->delete();
+            foreach ($request->input('special_dates', []) as $sd) {
+                if (empty($sd['date']) || empty($sd['amount'])) continue;
+                $property->specialDates()->create([
+                    'date'   => $sd['date'],
+                    'amount' => $sd['amount'],
+                    'label'  => $sd['label'] ?? null,
+                ]);
+            }
+        }
+
         // Handle inline Rooms
         if ($request->has('rooms')) {
             foreach ($request->input('rooms', []) as $idx => $roomData) {
@@ -256,6 +269,17 @@ class PropertyController extends Controller
 
         // Handle Collections
         $property->collections()->sync($request->collections ?? []);
+
+        // Handle Special Dates
+        $property->specialDates()->delete();
+        foreach ($request->input('special_dates', []) as $sd) {
+            if (empty($sd['date']) || empty($sd['amount'])) continue;
+            $property->specialDates()->create([
+                'date'   => $sd['date'],
+                'amount' => $sd['amount'],
+                'label'  => $sd['label'] ?? null,
+            ]);
+        }
 
         // Handle Gallery
         $gallery = $property->gallery ?? [];
