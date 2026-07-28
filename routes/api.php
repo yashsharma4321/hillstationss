@@ -60,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/v1/instagram-links', [InstagramLinkController::class, 'index']);
 
     Route::post('/customer/booking/cancel', [CancellationController::class, 'cancelBooking']);
+    Route::get('/customer/cancellations', [CancellationController::class, 'getCancellations']);
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
 
