@@ -75,10 +75,11 @@ class CancellationController extends Controller
         // Calculate days before check-in
         $checkinDate = Carbon::parse($booking->check_in);
         $currentDate = now();
-        $daysBeforeCheckin = $checkinDate->diffInDays($currentDate);
+        $daysBeforeCheckin = (int) $currentDate->startOfDay()->diffInDays($checkinDate->startOfDay());
 
         // Get applicable cancellation rule
-        $rule = CancellationRule::where('days_before', '<=', $daysBeforeCheckin)
+        $rule = CancellationRule::where('property_id', $booking->property_id)
+            ->where('days_before', '<=', $daysBeforeCheckin)
             ->orderBy('days_before', 'desc')
             ->first();
 
@@ -321,9 +322,10 @@ class CancellationController extends Controller
         
         $checkinDate = Carbon::parse($booking->check_in);
         $currentDate = now();
-        $daysBeforeCheckin = $checkinDate->diffInDays($currentDate);
+        $daysBeforeCheckin = (int) $currentDate->startOfDay()->diffInDays($checkinDate->startOfDay());
 
-        $rule = CancellationRule::where('days_before', '<=', $daysBeforeCheckin)
+        $rule = CancellationRule::where('property_id', $booking->property_id)
+            ->where('days_before', '<=', $daysBeforeCheckin)
             ->orderBy('days_before', 'desc')
             ->first();
 
