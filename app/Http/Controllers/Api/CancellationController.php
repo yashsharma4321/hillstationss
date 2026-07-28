@@ -36,6 +36,18 @@ class CancellationController extends Controller
             ]
         )
     )]
+    #[OA\Response(
+        response: 200,
+        description: "Booking cancelled successfully"
+    )]
+    #[OA\Response(
+        response: 422,
+        description: "Validation error or cannot cancel"
+    )]
+    #[OA\Response(
+        response: 404,
+        description: "Cancellation rule not found"
+    )]
     public function cancelBooking(Request $request)
     {
         $request->validate([
@@ -242,6 +254,10 @@ class CancellationController extends Controller
         tags: ["Cancellations"],
         security: [['bearerAuth' => []]]
     )]
+    #[OA\Response(
+        response: 200,
+        description: "List of cancellations"
+    )]
     public function getCancellations()
     {
         $cancellations = CancellationBooking::with(['booking.property'])
@@ -261,6 +277,10 @@ class CancellationController extends Controller
         path: "/api/cancellation-rules",
         summary: "Get cancellation rules",
         tags: ["Cancellations"]
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "List of cancellation rules"
     )]
     public function getRules()
     {
@@ -282,6 +302,14 @@ class CancellationController extends Controller
         in: "query",
         required: true,
         schema: new OA\Schema(type: "integer")
+    )]
+    #[OA\Response(
+        response: 200,
+        description: "Calculated cancellation charges"
+    )]
+    #[OA\Response(
+        response: 404,
+        description: "Cancellation rule not found"
     )]
     public function calculateCancellationCharges(Request $request)
     {

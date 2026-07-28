@@ -215,7 +215,8 @@
                 "tags": [
                     "Bookings"
                 ],
-                "summary": "Create a new booking",
+                "summary": "Initiate a new booking",
+                "description": "Creates a pending booking without payment confirmation. Returns booking_id for payment confirmation.",
                 "operationId": "39e1823664d5edf85e0d5f3b24c6e779",
                 "requestBody": {
                     "required": true,
@@ -230,42 +231,65 @@
                                 ],
                                 "properties": {
                                     "property_id": {
+                                        "description": "ID of the property to book",
                                         "type": "integer",
                                         "example": 1
                                     },
                                     "check_in": {
+                                        "description": "Check-in date",
                                         "type": "string",
                                         "format": "date",
                                         "example": "2026-06-01"
                                     },
                                     "check_out": {
+                                        "description": "Check-out date",
                                         "type": "string",
                                         "format": "date",
                                         "example": "2026-06-05"
                                     },
                                     "total_amount": {
+                                        "description": "Total booking amount",
                                         "type": "number",
+                                        "format": "float",
                                         "example": 5000
                                     },
+                                    "subtotal": {
+                                        "description": "Subtotal before tax",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 4500
+                                    },
+                                    "discount": {
+                                        "description": "Discount amount",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 500
+                                    },
+                                    "gst": {
+                                        "description": "GST amount",
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 500
+                                    },
                                     "adults": {
+                                        "description": "Number of adults",
                                         "type": "integer",
                                         "example": 2
                                     },
                                     "children": {
+                                        "description": "Number of children",
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "razorpay_payment_id": {
-                                        "type": "string",
-                                        "example": "pay_29QQoUBi66xm2f"
+                                    "room_type_id": {
+                                        "description": "Room type ID (optional)",
+                                        "type": "integer",
+                                        "example": 5
                                     },
-                                    "razorpay_order_id": {
+                                    "coupon_code": {
+                                        "description": "Coupon code (optional)",
                                         "type": "string",
-                                        "example": "order_9A33XWu170gUtm"
-                                    },
-                                    "razorpay_signature": {
-                                        "type": "string",
-                                        "example": "9efc..."
+                                        "example": "SAVE10"
                                     }
                                 },
                                 "type": "object"
@@ -275,7 +299,154 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Booking successful",
+                        "description": "Booking initiated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Booking initiated. Please complete payment."
+                                        },
+                                        "booking_id": {
+                                            "type": "integer",
+                                            "example": 123
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 123
+                                                },
+                                                "booking_number": {
+                                                    "type": "string",
+                                                    "example": "BST-ABC123DEF"
+                                                },
+                                                "property": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Luxury Villa"
+                                                        },
+                                                        "slug": {
+                                                            "type": "string",
+                                                            "example": "luxury-villa"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "check_in": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-06-01"
+                                                },
+                                                "check_out": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-06-05"
+                                                },
+                                                "total_amount": {
+                                                    "type": "number",
+                                                    "example": 5000
+                                                },
+                                                "final_amount": {
+                                                    "type": "number",
+                                                    "example": 5000
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                },
+                                                "payment_status": {
+                                                    "type": "string",
+                                                    "example": "pending"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Property not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Property not found."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error or vendor not assigned",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "This property has no vendor assigned."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/booking/{id}": {
+            "get": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Get booking details by ID",
+                "operationId": "9f5033dd9dea25e35765334c9eac9364",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Booking ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Booking details",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -292,6 +463,26 @@
                                 }
                             }
                         }
+                    },
+                    "404": {
+                        "description": "Booking not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Booking not found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
                     }
                 },
                 "security": [
@@ -299,6 +490,277 @@
                         "bearerAuth": []
                     }
                 ]
+            }
+        },
+        "/api/customer/booking-final": {
+            "post": {
+                "tags": [
+                    "Bookings"
+                ],
+                "summary": "Confirm booking payment",
+                "description": "Confirm payment for a pending booking. This will update payment status, credit vendor wallet, and create accounting entries.",
+                "operationId": "ca3c96452a84cd7dd5c6ae8653dd6587",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "booking_id",
+                                    "razorpay_payment_id",
+                                    "razorpay_order_id",
+                                    "razorpay_signature"
+                                ],
+                                "properties": {
+                                    "booking_id": {
+                                        "description": "ID of the pending booking",
+                                        "type": "integer",
+                                        "example": 123
+                                    },
+                                    "razorpay_payment_id": {
+                                        "description": "Razorpay payment ID",
+                                        "type": "string",
+                                        "example": "pay_29QQoUBi66xm2f"
+                                    },
+                                    "razorpay_order_id": {
+                                        "description": "Razorpay order ID",
+                                        "type": "string",
+                                        "example": "order_9A33XWu170gUtm"
+                                    },
+                                    "razorpay_signature": {
+                                        "description": "Razorpay signature for verification",
+                                        "type": "string",
+                                        "example": "9efc8b9f5e8b3a6d1c4e2f8a7b9d5e3f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Payment confirmed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment confirmed and booking completed successfully!"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 123
+                                                },
+                                                "booking_number": {
+                                                    "type": "string",
+                                                    "example": "BST-ABC123DEF"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "confirmed"
+                                                },
+                                                "payment_status": {
+                                                    "type": "string",
+                                                    "example": "paid"
+                                                },
+                                                "property": {
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "example": 1
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Luxury Villa"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "wallet": {
+                                            "properties": {
+                                                "vendor_amount_credited": {
+                                                    "type": "number",
+                                                    "example": 4500
+                                                },
+                                                "commission_deducted": {
+                                                    "type": "number",
+                                                    "example": 500
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation error or payment already processed",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Payment already processed for this booking."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Booking not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "error"
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No query results for model [App\\Models\\Booking]"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/customer/booking/cancel": {
+            "post": {
+                "tags": [
+                    "Cancellations"
+                ],
+                "summary": "Cancel a booking",
+                "description": "Cancel a confirmed booking and process refund based on cancellation rules",
+                "operationId": "8940a40f0e8680d193a200bda8f14a30",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "booking_id"
+                                ],
+                                "properties": {
+                                    "booking_id": {
+                                        "type": "integer",
+                                        "example": 123
+                                    },
+                                    "reason": {
+                                        "type": "string",
+                                        "example": "Change of plans"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Booking cancelled successfully"
+                    },
+                    "422": {
+                        "description": "Validation error or cannot cancel"
+                    },
+                    "404": {
+                        "description": "Cancellation rule not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/customer/cancellations": {
+            "get": {
+                "tags": [
+                    "Cancellations"
+                ],
+                "summary": "Get customer's cancelled bookings",
+                "operationId": "a304b2e9da70830d263a150073f58816",
+                "responses": {
+                    "200": {
+                        "description": "List of cancellations"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cancellation-rules": {
+            "get": {
+                "tags": [
+                    "Cancellations"
+                ],
+                "summary": "Get cancellation rules",
+                "operationId": "7e6db541b80e9b07684732ba861d4842",
+                "responses": {
+                    "200": {
+                        "description": "List of cancellation rules"
+                    }
+                }
+            }
+        },
+        "/api/cancellation-rules/calculate": {
+            "get": {
+                "tags": [
+                    "Cancellations"
+                ],
+                "summary": "Calculate cancellation charges",
+                "operationId": "a2ddd3b4ae6c09dec80dc8526b24ec4f",
+                "parameters": [
+                    {
+                        "name": "booking_id",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Calculated cancellation charges"
+                    },
+                    "404": {
+                        "description": "Cancellation rule not found"
+                    }
+                }
             }
         },
         "/api/chat/conversations": {
@@ -2160,16 +2622,20 @@
     },
     "tags": [
         {
+            "name": "Bookings",
+            "description": "Booking management endpoints"
+        },
+        {
+            "name": "Cancellations",
+            "description": "Booking cancellation endpoints"
+        },
+        {
             "name": "Authentication",
             "description": "Authentication"
         },
         {
             "name": "Blogs",
             "description": "Blogs"
-        },
-        {
-            "name": "Bookings",
-            "description": "Bookings"
         },
         {
             "name": "Chat",
