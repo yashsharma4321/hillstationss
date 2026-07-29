@@ -227,14 +227,23 @@ class PropertyController extends Controller
         $bookedDates = [];
         $propertyBookings = \App\Models\Booking::where('property_id', $property->id)
             ->where('status', '!=', 'cancelled')
+            ->where('check_out', '>=', now()->startOfDay())
             ->get();
 
         foreach ($propertyBookings as $pb) {
-            $checkIn = \Carbon\Carbon::parse($pb->check_in);
-            $checkOut = \Carbon\Carbon::parse($pb->check_out);
-            $period = \Carbon\CarbonPeriod::create($checkIn, $checkOut);
+            $checkIn = \Carbon\Carbon::parse($pb->check_in)->startOfDay();
+            $checkOut = \Carbon\Carbon::parse($pb->check_out)->startOfDay();
+            
+            // The property is available on the check-out date, so we don't mark it as booked.
+            // Unless check_in and check_out are the same day (which shouldn't happen, but just in case)
+            $endDate = $checkIn->isSameDay($checkOut) ? $checkOut : $checkOut->copy()->subDay();
+            
+            $period = \Carbon\CarbonPeriod::create($checkIn, $endDate);
             foreach ($period as $date) {
-                $bookedDates[] = $date->format('Y-m-d');
+                // Only include today and future dates
+                if ($date->startOfDay()->gte(now()->startOfDay())) {
+                    $bookedDates[] = $date->format('Y-m-d');
+                }
             }
         }
         $bookedDates = array_values(array_unique($bookedDates));
