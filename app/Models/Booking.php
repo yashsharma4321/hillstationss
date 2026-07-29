@@ -92,18 +92,18 @@ class Booking extends Model
         return $this->status !== 'cancelled' && $this->payment_status === 'paid';
     }
 
-    public function getRefundStatusAttribute()
+    public function getRefundStatusAttribute($value)
     {
         if ($this->refund_amount == 0) {
             return 'No Refund';
-        } elseif ($this->refund_status === 'completed') {
+        } elseif ($value === 'completed') {
             return 'Refunded';
-        } elseif ($this->refund_status === 'pending') {
+        } elseif ($value === 'pending') {
             return 'Refund Pending';
-        } elseif ($this->refund_status === 'failed') {
+        } elseif ($value === 'failed') {
             return 'Refund Failed';
         }
-        return 'Processing';
+        return $value ?: 'Processing';
     }
 
     public function getFormattedRefundAmountAttribute()
