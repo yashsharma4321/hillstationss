@@ -53,6 +53,8 @@ class UpdatePropertyRequest extends FormRequest
             'attraction_descriptions.*' => 'nullable|string',
             'existing_attraction_images.*' => 'nullable|string',
             'brochure' => 'nullable|file|mimes:pdf|max:10240',
+            'meals'    => 'nullable|array',
+            'meals.*'  => 'nullable|string|max:100',
         ];
 
         if (Auth::check() && Auth::user()->role === 'vendor') {

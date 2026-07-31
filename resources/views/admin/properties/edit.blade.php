@@ -1124,6 +1124,26 @@
         </div>
     </div>
 
+    <!-- MEAL PLANS -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 7h13M7 13l-1.5-7"></path><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+            Meal Plans Included
+        </h3>
+        @php
+            $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals'];
+            $selectedMeals = old('meals', $property->meals ?? []);
+        @endphp
+        <div class="amenity-grid">
+            @foreach($mealOptions as $meal)
+                <label class="amenity-item">
+                    <input type="checkbox" name="meals[]" value="{{ $meal }}" {{ in_array($meal, $selectedMeals) ? 'checked' : '' }}>
+                    {{ $meal }}
+                </label>
+            @endforeach
+        </div>
+    </div>
+
     <!-- CANCELLATION RULES -->
     <div class="form-section">
         <h3 class="section-title">

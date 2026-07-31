@@ -50,6 +50,8 @@ class StorePropertyRequest extends FormRequest
             'attraction_alts.*'       => 'nullable|string|max:255',
             'attraction_descriptions.*' => 'nullable|string',
             'brochure'                => 'nullable|file|mimes:pdf|max:10240',
+            'meals'                   => 'nullable|array',
+            'meals.*'                 => 'nullable|string|max:100',
             // Inline rooms
             'rooms'                   => 'nullable|array',
             'rooms.*.title'           => 'required_with:rooms.*|string|max:255',
