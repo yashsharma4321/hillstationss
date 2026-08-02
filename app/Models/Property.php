@@ -86,4 +86,9 @@ class Property extends Model
     {
         return $this->hasMany(PropertySpecialDate::class);
     }
+
+    public function bookings(): HasMany
+    {
+        return $this->hasMany(\App\Models\Booking::class);
+    }
 }

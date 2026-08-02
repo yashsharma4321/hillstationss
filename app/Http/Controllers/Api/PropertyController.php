@@ -94,20 +94,16 @@ class PropertyController extends Controller
 
         // Date-based Availability Filter
         if ($request->filled('check_in') && $request->filled('check_out')) {
-            $checkIn = $request->check_in;
+            $checkIn  = $request->check_in;
             $checkOut = $request->check_out;
 
-            // Exclude properties that have bookings overlapping the requested dates
-            $query->whereDoesntHave('roomTypes.bookings', function ($q) use ($checkIn, $checkOut) {
-                $q->whereIn('status', ['confirmed', 'paid'])
-                    ->where(function ($sub) use ($checkIn, $checkOut) {
-                        $sub->whereBetween('check_in', [$checkIn, $checkOut])
-                            ->orWhereBetween('check_out', [$checkIn, $checkOut])
-                            ->orWhere(function ($s) use ($checkIn, $checkOut) {
-                                $s->where('check_in', '<=', $checkIn)
-                                    ->where('check_out', '>=', $checkOut);
-                            });
-                    });
+            // Exclude properties that have a confirmed/paid booking overlapping the requested range.
+            // Two date ranges [A,B] and [C,D] overlap when A < D AND B > C.
+            // A booking with check_out == requested check_in is NOT a conflict (back-to-back is fine).
+            $query->whereDoesntHave('bookings', function ($q) use ($checkIn, $checkOut) {
+                $q->whereNotIn('status', ['cancelled'])
+                  ->where('check_in',  '<', $checkOut)
+                  ->where('check_out', '>', $checkIn);
             });
         }
 
