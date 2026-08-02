@@ -230,22 +230,35 @@ class CustomerAuthController extends Controller
     // ─── UPDATE PROFILE (protected) ──────────────────────────────────────────
 
     #[OA\Put(path: "/api/customer/profile", summary: "Update customer profile", tags: ["Customer Auth"], security: [["bearerAuth" => []]])]
-    #[OA\RequestBody(required: true, content: new OA\JsonContent(
-        properties: [
-            new OA\Property(property: "name", type: "string", example: "John Doe"),
-            new OA\Property(property: "phone", type: "string", example: "+919876543210"),
-        ]
+    #[OA\RequestBody(required: true, content: new OA\MediaType(
+        mediaType: "multipart/form-data",
+        schema: new OA\Schema(properties: [
+            new OA\Property(property: "name",   type: "string",  example: "John Doe"),
+            new OA\Property(property: "phone",  type: "string",  example: "+919876543210"),
+            new OA\Property(property: "avatar", type: "string",  format: "binary", description: "Profile photo (jpeg/png/jpg/webp, max 2MB)"),
+        ])
     ))]
     #[OA\Response(response: 200, description: "Profile updated")]
     public function updateProfile(Request $request)
     {
         $request->validate([
-            'name'  => 'sometimes|required|string|max:255',
-            'phone' => 'sometimes|nullable|string|max:20',
+            'name'   => 'sometimes|required|string|max:255',
+            'phone'  => 'sometimes|nullable|string|max:20',
+            'avatar' => 'sometimes|nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
         $user = $request->user();
-        $user->update($request->only(['name', 'phone']));
+        $data = $request->only(['name', 'phone']);
+
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar if it's a stored file (not a Google URL)
+            if ($user->avatar && !str_starts_with($user->avatar, 'http')) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->avatar);
+            }
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user->update($data);
 
         return response()->json([
             'status'  => 'success',

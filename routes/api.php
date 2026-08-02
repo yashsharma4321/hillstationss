@@ -168,6 +168,7 @@ Route::prefix('customer')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/profile', [\App\Http\Controllers\Api\CustomerAuthController::class, 'profile']);
         Route::put('/profile', [\App\Http\Controllers\Api\CustomerAuthController::class, 'updateProfile']);
+        Route::post('/profile', [\App\Http\Controllers\Api\CustomerAuthController::class, 'updateProfile']);
         Route::post('/logout', [\App\Http\Controllers\Api\CustomerAuthController::class, 'logout']);
 
         // Bookings
