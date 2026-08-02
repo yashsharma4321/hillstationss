@@ -1131,7 +1131,7 @@
             Meal Plans Included
         </h3>
         @php
-            $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals'];
+            $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'];
             $selectedMeals = old('meals', $property->meals ?? []);
         @endphp
         <div class="amenity-grid">

@@ -164,7 +164,7 @@
                 Meal Plans Included
             </h3>
             @php
-                $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals'];
+                $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'];
                 $selectedMeals = old('meals', $property->meals ?? []);
             @endphp
             <div class="amenity-grid">
@@ -339,7 +339,7 @@
                                 <label class="form-label">Meal Plans</label>
                                 <div class="amenity-grid">
                                     @php $roomMeals = is_array($room->meals) ? $room->meals : (json_decode($room->meals, true) ?? []); @endphp
-                                    @foreach(['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'No Meals'] as $m)
+                                    @foreach(['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'] as $m)
                                         <label class="amenity-item"><input type="checkbox" name="existing_rooms[{{ $ridx }}][meals][]" value="{{ $m }}" {{ in_array($m, $roomMeals) ? 'checked' : '' }}> {{ $m }}</label>
                                     @endforeach
                                 </div>
@@ -453,7 +453,7 @@
     }
 
     let rIdx = 0;
-    const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'No Meals'];
+    const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'];
     const BEDS = ['Single', 'Double', 'Queen', 'King', 'Twin'];
 
     function addRoom() {

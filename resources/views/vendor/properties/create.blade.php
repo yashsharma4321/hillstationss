@@ -158,7 +158,7 @@
                 Meal Plans Included
             </h3>
             @php
-                $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals'];
+                $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'];
                 $selectedMeals = old('meals', []);
             @endphp
             <div class="amenity-grid">
@@ -356,7 +356,7 @@
     }
 
     let rIdx = 0;
-    const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'No Meals'];
+    const MEALS = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'];
     const BEDS = ['Single', 'Double', 'Queen', 'King', 'Twin'];
 
     function addRoom(titleVal = '', bedVal = '', descVal = '', mealsArr = []) {

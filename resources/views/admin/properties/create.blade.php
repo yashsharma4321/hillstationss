@@ -864,7 +864,7 @@
             Meal Plans Included
         </h3>
         @php
-            $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals'];
+            $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'];
             $selectedMeals = old('meals', []);
         @endphp
         <div class="amenity-grid">
@@ -1064,7 +1064,7 @@
     // ── Room Builder ──────────────────────────────────────────────────────
     let roomIndex = 0;
 
-    const MEAL_OPTIONS = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals'];
+    const MEAL_OPTIONS = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'];
     const BED_TYPES    = ['Single', 'Double', 'Queen', 'King', 'Twin', 'Bunk Bed', 'Sofa Bed', 'Triple'];
 
     function updateBadge() {
