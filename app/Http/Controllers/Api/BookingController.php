@@ -137,7 +137,7 @@ class BookingController extends Controller
                 new OA\Property(property: "gst", type: "number", format: "float", example: 500, description: "GST amount"),
                 new OA\Property(property: "adults", type: "integer", example: 2, description: "Number of adults"),
                 new OA\Property(property: "children", type: "integer", example: 1, description: "Number of children"),
-                new OA\Property(property: "room_type_id", type: "integer", example: 5, description: "Room type ID (optional)"),
+                new OA\Property(property: "room_type_id", type: "integer", example: 5, description: "Room ID from the rooms table (optional)"),
                 new OA\Property(property: "coupon_code", type: "string", example: "SAVE10", description: "Coupon code (optional)"),
             ]
         )
@@ -199,12 +199,13 @@ class BookingController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'property_id' => 'required',
-            'check_in' => 'required|date',
-            'check_out' => 'required|date',
-            'total_amount' => 'required|numeric|min:0',
-            'adults' => 'nullable|integer|min:1',
-            'children' => 'nullable|integer|min:0',
+            'property_id'   => 'required',
+            'check_in'      => 'required|date',
+            'check_out'     => 'required|date',
+            'total_amount'  => 'required|numeric|min:0',
+            'adults'        => 'nullable|integer|min:1',
+            'children'      => 'nullable|integer|min:0',
+            'room_type_id'  => 'nullable|integer|exists:rooms,id',
         ]);
 
         $property = Property::find($request->property_id);
