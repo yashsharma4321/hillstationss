@@ -1258,73 +1258,6 @@
         </div>
     </div>
 
-    <!-- ROOMS & UNITS -->
-    <div class="form-section" style="margin-top:0;">
-        <h3 class="section-title" style="justify-content: space-between;">
-            <span style="display:flex;align-items:center;gap:0.5rem;">
-                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                Rooms &amp; Units
-                <span class="badge-count">{{ $property->rooms()->count() }} Rooms</span>
-            </span>
-            <a href="{{ route('admin.properties.rooms.create', $property) }}" class="btn-add-primary" style="font-size:0.8rem; padding:0.45rem 1.1rem;">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
-                Add New Room
-            </a>
-        </h3>
-
-        @php $rooms = $property->rooms()->latest()->get(); @endphp
-
-        @if($rooms->isEmpty())
-            <div class="empty-state">
-                <svg width="48" height="48" fill="none" stroke="#cbd5e1" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                <p class="title">No rooms yet</p>
-                <p class="subtitle">Click <strong>Add New Room</strong> above to add rooms for this property.</p>
-            </div>
-        @else
-            <div class="room-grid">
-                @foreach($rooms as $room)
-                    @php
-                        $firstImage = collect($room->images ?? [])
-                            ->map(fn($img) => is_array($img) ? $img : ['path' => $img, 'alt' => ''])
-                            ->first();
-                    @endphp
-                    <div class="room-card-item">
-                        @if($firstImage && $firstImage['path'])
-                            <img src="{{ Storage::url($firstImage['path']) }}" alt="{{ $firstImage['alt'] }}" class="room-image">
-                        @else
-                            <div class="room-placeholder">
-                                <svg width="40" height="40" fill="none" stroke="#a5b4fc" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                            </div>
-                        @endif
-                        <div class="room-body">
-                            <div class="room-title">{{ $room->title }}</div>
-                            @if($room->bed_type)
-                                <div class="room-bed">🛏 {{ $room->bed_type }}</div>
-                            @endif
-                            @if(!empty($room->meals))
-                                <div class="room-meals">🍽 {{ implode(', ', $room->meals) }}</div>
-                            @endif
-                            <div class="room-meta">
-                                {{ count($room->images ?? []) }} image(s)
-                                &nbsp;•&nbsp;
-                                <span class="room-status {{ $room->is_active ? 'active' : 'inactive' }}">
-                                    {{ $room->is_active ? 'Active' : 'Inactive' }}
-                                </span>
-                            </div>
-                            <div class="room-actions">
-                                <a href="{{ route('admin.rooms.edit', $room) }}" class="btn-edit">Edit</a>
-                                <form action="{{ route('admin.rooms.destroy', $room) }}" method="POST" onsubmit="return confirm('Delete this room?')" style="flex:1;">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="btn-delete">Delete</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-    </div>
-
     <div class="action-buttons">
         <a href="{{ route('admin.properties.index') }}" class="btn-cancel">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -1336,6 +1269,73 @@
         </button>
     </div>
 </form>
+
+<!-- ROOMS & UNITS — outside main form to prevent nested form conflict -->
+<div class="form-section" style="margin-top:0;">
+    <h3 class="section-title" style="justify-content: space-between;">
+        <span style="display:flex;align-items:center;gap:0.5rem;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Rooms &amp; Units
+            <span class="badge-count">{{ $property->rooms()->count() }} Rooms</span>
+        </span>
+        <a href="{{ route('admin.properties.rooms.create', $property) }}" class="btn-add-primary" style="font-size:0.8rem; padding:0.45rem 1.1rem;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add New Room
+        </a>
+    </h3>
+
+    @php $rooms = $property->rooms()->latest()->get(); @endphp
+
+    @if($rooms->isEmpty())
+        <div class="empty-state">
+            <svg width="48" height="48" fill="none" stroke="#cbd5e1" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <p class="title">No rooms yet</p>
+            <p class="subtitle">Click <strong>Add New Room</strong> above to add rooms for this property.</p>
+        </div>
+    @else
+        <div class="room-grid">
+            @foreach($rooms as $room)
+                @php
+                    $firstImage = collect($room->images ?? [])
+                        ->map(fn($img) => is_array($img) ? $img : ['path' => $img, 'alt' => ''])
+                        ->first();
+                @endphp
+                <div class="room-card-item">
+                    @if($firstImage && $firstImage['path'])
+                        <img src="{{ Storage::url($firstImage['path']) }}" alt="{{ $firstImage['alt'] }}" class="room-image">
+                    @else
+                        <div class="room-placeholder">
+                            <svg width="40" height="40" fill="none" stroke="#a5b4fc" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        </div>
+                    @endif
+                    <div class="room-body">
+                        <div class="room-title">{{ $room->title }}</div>
+                        @if($room->bed_type)
+                            <div class="room-bed">🛏 {{ $room->bed_type }}</div>
+                        @endif
+                        @if(!empty($room->meals))
+                            <div class="room-meals">🍽 {{ implode(', ', $room->meals) }}</div>
+                        @endif
+                        <div class="room-meta">
+                            {{ count($room->images ?? []) }} image(s)
+                            &nbsp;•&nbsp;
+                            <span class="room-status {{ $room->is_active ? 'active' : 'inactive' }}">
+                                {{ $room->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                        <div class="room-actions">
+                            <a href="{{ route('admin.rooms.edit', $room) }}" class="btn-edit">Edit</a>
+                            <form action="{{ route('admin.rooms.destroy', $room) }}" method="POST" onsubmit="return confirm('Delete this room?')" style="flex:1;">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn-delete">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+</div>
 @endsection
 
 @section('scripts')
