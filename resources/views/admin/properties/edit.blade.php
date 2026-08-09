@@ -1045,7 +1045,7 @@
                         </div>
                         <div style="display:grid; align-content:center; gap:0.5rem;">
                             <label class="form-label" style="font-size:0.75rem;">Video URL <span class="required-star">*</span></label>
-                            <input type="url" name="instagram_video_links[{{ $index }}]" value="{{ $videoLink }}" class="form-input" placeholder="https://www.instagram.com/reels/XXXXX/" required>
+                            <input type="url" name="instagram_video_links[{{ $index }}]" value="{{ $videoLink }}" class="form-input" placeholder="https://www.instagram.com/reels/XXXXX/">
                         </div>
                     </div>
                 </div>
@@ -1161,11 +1161,11 @@
                 <div class="cancellation-rule">
                     <div class="rule-field">
                         <label class="form-label">Days Before Check-in</label>
-                        <input type="number" name="cancellation_rules[{{ $index }}][days_before]" value="{{ $rule->days_before }}" class="form-input" required min="0" placeholder="e.g. 5">
+                        <input type="number" name="cancellation_rules[{{ $index }}][days_before]" value="{{ $rule->days_before }}" class="form-input" min="0" placeholder="e.g. 5">
                     </div>
                     <div class="rule-field">
                         <label class="form-label">Deduction Percentage (%)</label>
-                        <input type="number" name="cancellation_rules[{{ $index }}][deduction_percentage]" value="{{ $rule->deduction_percentage }}" class="form-input" required min="0" max="100" step="0.01" placeholder="e.g. 20">
+                        <input type="number" name="cancellation_rules[{{ $index }}][deduction_percentage]" value="{{ $rule->deduction_percentage }}" class="form-input" min="0" max="100" step="0.01" placeholder="e.g. 20">
                     </div>
                     <button type="button" class="btn-remove-rule" onclick="this.parentElement.remove()">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -1193,11 +1193,11 @@
                 <div class="special-date-row">
                     <div>
                         <label class="form-label" style="font-size:0.78rem;">Date <span class="required-star">*</span></label>
-                        <input type="date" name="special_dates[{{ $index }}][date]" value="{{ $sd->date->format('Y-m-d') }}" class="form-input" required>
+                        <input type="date" name="special_dates[{{ $index }}][date]" value="{{ $sd->date->format('Y-m-d') }}" class="form-input">
                     </div>
                     <div>
                         <label class="form-label" style="font-size:0.78rem;">Amount (₹) <span class="required-star">*</span></label>
-                        <input type="number" name="special_dates[{{ $index }}][amount]" value="{{ $sd->amount }}" class="form-input" min="0" step="0.01" required placeholder="e.g. 15000">
+                        <input type="number" name="special_dates[{{ $index }}][amount]" value="{{ $sd->amount }}" class="form-input" min="0" step="0.01" placeholder="e.g. 15000">
                     </div>
                     <div>
                         <label class="form-label" style="font-size:0.78rem;">Label</label>
@@ -1386,7 +1386,7 @@
                 </div>
                 <div style="display:grid; align-content:center; gap:0.5rem;">
                     <label class="form-label" style="font-size:0.75rem;">Video URL <span class="required-star">*</span></label>
-                    <input type="url" name="instagram_video_links[${instaIdx}]" class="form-input" placeholder="https://www.instagram.com/reels/XXXXX/" required>
+                    <input type="url" name="instagram_video_links[${instaIdx}]" class="form-input" placeholder="https://www.instagram.com/reels/XXXXX/">
                 </div>
             </div>
         `;
@@ -1423,11 +1423,11 @@
         card.innerHTML = `
             <div class="rule-field">
                 <label class="form-label">Days Before Check-in</label>
-                <input type="number" name="cancellation_rules[${cancelIdx}][days_before]" class="form-input" placeholder="e.g. 5" required min="0">
+                <input type="number" name="cancellation_rules[${cancelIdx}][days_before]" class="form-input" placeholder="e.g. 5" min="0">
             </div>
             <div class="rule-field">
                 <label class="form-label">Deduction Percentage (%)</label>
-                <input type="number" name="cancellation_rules[${cancelIdx}][deduction_percentage]" class="form-input" placeholder="e.g. 20" required min="0" max="100" step="0.01">
+                <input type="number" name="cancellation_rules[${cancelIdx}][deduction_percentage]" class="form-input" placeholder="e.g. 20" min="0" max="100" step="0.01">
             </div>
             <button type="button" class="btn-remove-rule" onclick="this.parentElement.remove()">
                 <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
@@ -1445,11 +1445,11 @@
         row.innerHTML = `
             <div>
                 <label class="form-label" style="font-size:0.78rem;">Date <span class="required-star">*</span></label>
-                <input type="date" name="special_dates[${sdIdx}][date]" class="form-input" required>
+                <input type="date" name="special_dates[${sdIdx}][date]" class="form-input">
             </div>
             <div>
                 <label class="form-label" style="font-size:0.78rem;">Amount (₹) <span class="required-star">*</span></label>
-                <input type="number" name="special_dates[${sdIdx}][amount]" class="form-input" min="0" step="0.01" required placeholder="e.g. 15000">
+                <input type="number" name="special_dates[${sdIdx}][amount]" class="form-input" min="0" step="0.01" placeholder="e.g. 15000">
             </div>
             <div>
                 <label class="form-label" style="font-size:0.78rem;">Label</label>
