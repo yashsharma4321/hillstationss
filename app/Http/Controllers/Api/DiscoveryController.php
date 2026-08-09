@@ -109,6 +109,7 @@ class DiscoveryController extends Controller
     ]);
 }
     #[OA\Get(path: "/api/discovery/for-you", summary: "Get 'Properties for You' villas grouped by BHK", tags: ["Discovery"])]
+    #[OA\Parameter(name: "destination", in: "query", required: false, description: "Filter by destination slug", schema: new OA\Schema(type: "string"))]
     #[OA\Response(
         response: 200,
         description: "List of properties grouped by BHK count",
@@ -119,16 +120,23 @@ class DiscoveryController extends Controller
             ]
         )
     )]
-    public function propertiesForYou()
+    public function propertiesForYou(Request $request)
     {
-        $properties = Property::where('is_featured', 1)
+        $query = Property::where('is_featured', 1)
             ->where('status', 'active')
             ->with([
                 'roomTypes' => function ($q) {
                     $q->select('property_id', 'base_price')->orderBy('base_price', 'asc');
                 }
-            ])
-            ->get();
+            ]);
+
+        if ($request->filled('destination')) {
+            $query->whereHas('destination', function ($q) use ($request) {
+                $q->where('slug', $request->destination);
+            });
+        }
+
+        $properties = $query->get();
 
         $grouped = $properties->groupBy('total_bedrooms');
 
