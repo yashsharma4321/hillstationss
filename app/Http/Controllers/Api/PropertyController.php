@@ -186,6 +186,7 @@ class PropertyController extends Controller
                 'category',
                 'destination',
                 'amenities',
+                'collections',
                 'rooms',
                 'vendor.user',
                 'cancellationRules',
@@ -293,12 +294,14 @@ class PropertyController extends Controller
                 'name' => $property->vendor->user->name ?? null,
                 'email' => $property->vendor->user->email ?? null,
             ],
-            // Meals collected from all active rooms (unique, flat)
-            'meals' => $property->rooms
-                ->where('is_active', true)
-                ->flatMap(fn($r) => $r->meals ?? [])
-                ->unique()
-                ->values(),
+            // Meals from the property's own meals field
+            'meals' => $property->meals ?? [],
+            // Collections this property belongs to
+            'collections' => $property->collections->map(fn($c) => [
+                'id'      => $c->id,
+                'heading' => $c->heading,
+                'slug'    => $c->slug,
+            ])->values(),
             'rooms' => $property->rooms->where('is_active', true)->values()->map(function ($room) {
                 $images = collect($room->images ?? [])->map(function ($img) {
                     $imgPath = is_array($img) ? ($img['path'] ?? '') : $img;
