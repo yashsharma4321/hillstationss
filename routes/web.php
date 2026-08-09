@@ -81,8 +81,8 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('properties/{property}/rooms', [\App\Http\Controllers\Admin\RoomController::class, 'store'])->name('admin.properties.rooms.store');
     Route::get('rooms/{room}/edit', [\App\Http\Controllers\Admin\RoomController::class, 'edit'])->name('admin.rooms.edit');
     Route::put('rooms/{room}', [\App\Http\Controllers\Admin\RoomController::class, 'update'])->name('admin.rooms.update');
-    Route::delete('rooms/{room}', [\App\Http\Controllers\Admin\RoomController::class, 'destroy'])->name('admin.rooms.destroy');
     Route::delete('rooms/image/{room}', [\App\Http\Controllers\Admin\RoomController::class, 'deleteImage'])->name('admin.rooms.image.delete');
+    Route::delete('rooms/{room}', [\App\Http\Controllers\Admin\RoomController::class, 'destroy'])->name('admin.rooms.destroy');
 });
 
 // Vendor Routes

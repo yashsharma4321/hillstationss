@@ -38,6 +38,13 @@
     </div>
 @endif
 
+@if(session('error'))
+    <div style="background:#fee2e2; border:1px solid #fca5a5; color:#991b1b; padding:0.875rem 1.25rem; border-radius:0.5rem; margin-bottom:1.5rem; display:flex; align-items:center; gap:0.5rem;">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"></path></svg>
+        {{ session('error') }}
+    </div>
+@endif
+
 <div class="page-actions">
     <div>
         <a href="{{ route('admin.properties.edit', $property) }}" class="btn-secondary">

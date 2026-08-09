@@ -117,6 +117,14 @@ class RoomController extends Controller
     {
         $propertyId = $room->property_id;
 
+        // Safety guard: never allow deleting the property's last room
+        // (the only way to delete the property is through the property delete action)
+        $roomCount = Room::where('property_id', $propertyId)->count();
+        if ($roomCount <= 1) {
+            return redirect()->route('admin.properties.rooms.index', $propertyId)
+                ->with('error', 'Cannot delete the last room. A property must have at least one room. Use the property delete option if you want to remove the property entirely.');
+        }
+
         foreach ($room->images ?? [] as $image) {
             $path = is_array($image) ? ($image['path'] ?? '') : $image;
             if ($path) Storage::disk('public')->delete($path);

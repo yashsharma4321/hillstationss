@@ -98,7 +98,7 @@
         </h3>
         @php $currentMeals = old('meals', $room->meals ?? []); @endphp
         <div class="meal-grid">
-            @foreach(['Breakfast','Lunch','Dinner','All Inclusive','Breakfast & Dinner','No Meals'] as $meal)
+            @foreach(['Breakfast','Lunch','Dinner','All Inclusive','Breakfast & Dinner','No Meals','Veg','Non-Veg','Jain'] as $meal)
                 <label class="meal-item">
                     <input type="checkbox" name="meals[]" value="{{ $meal }}"
                            {{ in_array($meal, $currentMeals) ? 'checked' : '' }}>
