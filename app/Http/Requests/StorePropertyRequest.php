@@ -25,6 +25,7 @@ class StorePropertyRequest extends FormRequest
             'total_bedrooms' => 'required|integer|min:0',
             'total_bathrooms' => 'required|integer|min:0',
             'max_guests' => 'required|integer|min:0',
+            'max_capacity' => 'nullable|integer|min:0',
             'city' => 'required|string|max:255',
             'state' => 'required|string|max:255',
             'country' => 'required|string|max:255',

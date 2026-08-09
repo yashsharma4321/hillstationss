@@ -137,6 +137,7 @@ class PropertyController extends Controller
                 'bedrooms' => $prop->total_bedrooms,
                 'bathrooms' => $prop->total_bathrooms,
                 'guests' => $prop->max_guests,
+                'max_capacity' => $prop->max_capacity,
                 'latitude' => $prop->latitude,
                 'longitude' => $prop->longitude,
                 'distance' => isset($prop->distance) ? round($prop->distance, 2) . ' km' : null,

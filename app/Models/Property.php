@@ -11,7 +11,7 @@ class Property extends Model
 {
     protected $fillable = [
         'vendor_id', 'category_id', 'destination_id', 'name', 'slug', 'description', 'amount',
-        'total_bedrooms', 'total_bathrooms', 'max_guests', 'address', 'gallery',
+        'total_bedrooms', 'total_bathrooms', 'max_guests', 'max_capacity', 'address', 'gallery',
         'city', 'state', 'zip_code', 'country', 'latitude', 'longitude', 
         'check_in_time', 'check_out_time', 'status', 'average_rating', 'show_on_homepage', 
         'is_featured', 'show_in_menu', 'gst', 'extra_person_charge', 'instagram_videos', 'nearby_attractions', 'brochure', 'meals'

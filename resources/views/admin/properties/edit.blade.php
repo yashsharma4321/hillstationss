@@ -899,6 +899,10 @@
                         <label class="form-label">Max Guests <span class="required-star">*</span></label>
                         <input type="number" name="max_guests" value="{{ old('max_guests', $property->max_guests) }}" required class="form-input" min="0">
                     </div>
+                    <div>
+                        <label class="form-label">Max Capacity</label>
+                        <input type="number" name="max_capacity" value="{{ old('max_capacity', $property->max_capacity) }}" class="form-input" min="0" placeholder="Total capacity (guests + staff etc.)">
+                    </div>
                 </div>
             </div>
 
