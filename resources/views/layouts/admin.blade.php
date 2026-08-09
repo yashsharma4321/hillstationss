@@ -499,6 +499,17 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('admin.booking-requests.index') }}"
+                        class="{{ request()->routeIs('admin.booking-requests.*') ? 'active' : '' }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 11l3 3L22 4"/>
+                            <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+                        </svg>
+                        <span>Booking Requests</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('admin.chat') }}"
                         class="{{ request()->routeIs('admin.chat*') ? 'active' : '' }}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"

@@ -214,6 +214,8 @@
                         class="{{ request()->is('vendor/withdrawals*') ? 'active' : '' }}">💰 Withdrawals</a></li>
                 <li><a href="{{ route('vendor.bookings.index') }}"
                         class="{{ request()->is('vendor/bookings*') ? 'active' : '' }}">📅 Bookings</a></li>
+                <li><a href="{{ route('vendor.booking-requests.index') }}"
+                        class="{{ request()->is('vendor/booking-requests*') ? 'active' : '' }}">📋 Booking Requests</a></li>
                 <li>
                     <a href="{{ route('vendor.chat') }}" class="{{ request()->is('vendor/chat*') ? 'active' : '' }}">
                         💬 Chat

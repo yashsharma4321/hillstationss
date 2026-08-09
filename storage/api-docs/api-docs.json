@@ -654,6 +654,76 @@
                 ]
             }
         },
+        "/api/booking-request": {
+            "post": {
+                "tags": [
+                    "Booking Requests"
+                ],
+                "summary": "Submit a booking enquiry for a property",
+                "operationId": "b15a924e748cb384f19537d48c362f4b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "property_id",
+                                    "name",
+                                    "email",
+                                    "check_in",
+                                    "check_out"
+                                ],
+                                "properties": {
+                                    "property_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Rahul Sharma"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "rahul@example.com"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+919876543210"
+                                    },
+                                    "check_in": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-09-01"
+                                    },
+                                    "check_out": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-09-05"
+                                    },
+                                    "adults": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "message": {
+                                        "type": "string",
+                                        "example": "We are a family of 4."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Booking request submitted"
+                    },
+                    "422": {
+                        "description": "Validation error"
+                    }
+                }
+            }
+        },
         "/api/customer/booking/cancel": {
             "post": {
                 "tags": [
@@ -2640,6 +2710,10 @@
         {
             "name": "Bookings",
             "description": "Booking management endpoints"
+        },
+        {
+            "name": "Booking Requests",
+            "description": "Enquiry / booking request from property detail page"
         },
         {
             "name": "Cancellations",

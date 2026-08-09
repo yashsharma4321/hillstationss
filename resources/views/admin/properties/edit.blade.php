@@ -886,7 +886,7 @@
             </div>
 
             <div class="form-group full-width">
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1.5rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:1.5rem;">
                     <div>
                         <label class="form-label">Total Bedrooms <span class="required-star">*</span></label>
                         <input type="number" name="total_bedrooms" value="{{ old('total_bedrooms', $property->total_bedrooms) }}" required class="form-input" min="0">
@@ -901,7 +901,7 @@
                     </div>
                     <div>
                         <label class="form-label">Max Capacity</label>
-                        <input type="number" name="max_capacity" value="{{ old('max_capacity', $property->max_capacity) }}" class="form-input" min="0" placeholder="Total capacity (guests + staff etc.)">
+                        <input type="number" name="max_capacity" value="{{ old('max_capacity', $property->max_capacity) }}" class="form-input" min="0" placeholder="Guests + Staff">
                     </div>
                 </div>
             </div>

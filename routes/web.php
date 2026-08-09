@@ -49,6 +49,10 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('bookings/{booking}/edit',   [\App\Http\Controllers\Admin\BookingController::class, 'edit'])->name('admin.bookings.edit');
     Route::put('bookings/{booking}',        [\App\Http\Controllers\Admin\BookingController::class, 'update'])->name('admin.bookings.update');
     Route::post('bookings/{booking}/refund',[\App\Http\Controllers\Admin\BookingController::class, 'cancelAndRefund'])->name('admin.bookings.refund');
+    // Booking Requests (enquiries)
+    Route::get('booking-requests', [\App\Http\Controllers\Admin\BookingRequestController::class, 'index'])->name('admin.booking-requests.index');
+    Route::patch('booking-requests/{bookingRequest}/status', [\App\Http\Controllers\Admin\BookingRequestController::class, 'updateStatus'])->name('admin.booking-requests.status');
+    Route::delete('booking-requests/{bookingRequest}', [\App\Http\Controllers\Admin\BookingRequestController::class, 'destroy'])->name('admin.booking-requests.destroy');
     Route::resource('pages', \App\Http\Controllers\Admin\PageController::class)->names('admin.pages');
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->names('admin.categories');
     Route::resource('amenities', \App\Http\Controllers\Admin\AmenityController::class)->names('admin.amenities');
@@ -106,6 +110,9 @@ Route::middleware(['vendor'])->prefix('vendor')->group(function () {
     Route::resource('coupons', \App\Http\Controllers\Vendor\CouponController::class)->names('vendor.coupons');
     
     Route::get('/bookings', [\App\Http\Controllers\Vendor\BookingController::class, 'index'])->name('vendor.bookings.index');
+    // Booking Requests (enquiries)
+    Route::get('/booking-requests', [\App\Http\Controllers\Vendor\BookingRequestController::class, 'index'])->name('vendor.booking-requests.index');
+    Route::patch('/booking-requests/{bookingRequest}/status', [\App\Http\Controllers\Vendor\BookingRequestController::class, 'updateStatus'])->name('vendor.booking-requests.status');
     Route::get('/withdrawals', [\App\Http\Controllers\Vendor\WithdrawalController::class, 'index'])->name('vendor.withdrawals.index');
     Route::post('/withdrawals', [\App\Http\Controllers\Vendor\WithdrawalController::class, 'store'])->name('vendor.withdrawals.store');
     
