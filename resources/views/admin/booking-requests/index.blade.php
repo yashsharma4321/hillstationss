@@ -39,6 +39,15 @@
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Name, email, phone...">
         </div>
         <div class="filter-group">
+            <label>Property</label>
+            <select name="property_id">
+                <option value="">All Properties</option>
+                @foreach($properties as $prop)
+                    <option value="{{ $prop->id }}" {{ request('property_id') == $prop->id ? 'selected' : '' }}>{{ $prop->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="filter-group">
             <label>Status</label>
             <select name="status">
                 <option value="">All</option>
@@ -46,6 +55,14 @@
                     <option value="{{ $s }}" {{ request('status') == $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>
                 @endforeach
             </select>
+        </div>
+        <div class="filter-group">
+            <label>Start Date</label>
+            <input type="date" name="start_date" value="{{ request('start_date') }}">
+        </div>
+        <div class="filter-group">
+            <label>End Date</label>
+            <input type="date" name="end_date" value="{{ request('end_date') }}">
         </div>
         <button type="submit" style="padding:0.55rem 1.25rem; background:var(--primary); color:white; border:none; border-radius:0.5rem; font-weight:600; cursor:pointer;">Filter</button>
         <a href="{{ route('admin.booking-requests.index') }}" style="padding:0.55rem 1rem; background:#f1f5f9; color:var(--text-main); border-radius:0.5rem; font-size:0.875rem; text-decoration:none; font-weight:500;">Clear</a>
@@ -62,10 +79,11 @@
                 <th>#</th>
                 <th>Name</th>
                 <th>Email / Phone</th>
-                <th>Property</th>
+                <th>Property / Room</th>
                 <th>Check-in</th>
                 <th>Check-out</th>
-                <th>Adults</th>
+                <th>Guests</th>
+                <th>Price / Code</th>
                 <th>Message</th>
                 <th>Status</th>
                 <th>Submitted</th>
@@ -83,11 +101,29 @@
                     </td>
                     <td>
                         <div style="font-weight:500;">{{ $req->property->name ?? '—' }}</div>
+                        @if($req->roomType)
+                            <div style="font-size:0.78rem; color:var(--primary); font-weight:600;">{{ $req->roomType->name }}</div>
+                        @endif
                         <div style="font-size:0.75rem; color:var(--text-muted);">{{ $req->vendor->user->name ?? '—' }}</div>
                     </td>
                     <td>{{ $req->check_in->format('d M Y') }}</td>
                     <td>{{ $req->check_out->format('d M Y') }}</td>
-                    <td>{{ $req->adults }}</td>
+                    <td>
+                        <div>A: {{ $req->adults }}</div>
+                        @if($req->children > 0)
+                            <div style="font-size:0.78rem; color:var(--text-muted);">C: {{ $req->children }}</div>
+                        @endif
+                    </td>
+                    <td>
+                        <div><strong>₹{{ number_format($req->total_amount, 2) }}</strong></div>
+                        <div style="font-size:0.75rem; color:var(--text-muted);">
+                            Sub: ₹{{ number_format($req->subtotal, 2) }}
+                            @if($req->discount > 0) <span style="color:var(--danger)">-₹{{ number_format($req->discount, 2) }}</span> @endif
+                        </div>
+                        @if($req->coupon_code)
+                            <div style="font-size:0.75rem; color:var(--success); font-weight:600;">Code: {{ $req->coupon_code }}</div>
+                        @endif
+                    </td>
                     <td style="max-width:180px; color:var(--text-muted); font-size:0.8rem;">{{ Str::limit($req->message, 60) }}</td>
                     <td>
                         <form method="POST" action="{{ route('admin.booking-requests.status', $req) }}" class="status-form">
@@ -109,7 +145,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="11" style="text-align:center; padding:3rem; color:var(--text-muted);">No booking requests found.</td>
+                    <td colspan="12" style="text-align:center; padding:3rem; color:var(--text-muted);">No booking requests found.</td>
                 </tr>
             @endforelse
         </tbody>

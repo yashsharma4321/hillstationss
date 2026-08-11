@@ -55,10 +55,10 @@ Route::get('/create-storage-link', function () {
 Route::get('coupons', [\App\Http\Controllers\Api\CouponController::class, 'index']);
 Route::post('coupons/apply', [\App\Http\Controllers\Api\CouponController::class, 'apply']);
 
-// Booking Request (public enquiry)
-Route::post('booking-request', [\App\Http\Controllers\Api\BookingRequestController::class, 'store']);
-
 Route::middleware('auth:sanctum')->group(function () {
+
+    // Booking Request (authenticated enquiry)
+    Route::post('booking-request', [\App\Http\Controllers\Api\BookingRequestController::class, 'store']);
 
     Route::get('/v1/instagram-links', [InstagramLinkController::class, 'index']);
 

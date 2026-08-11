@@ -36,7 +36,7 @@ class PropertyController extends Controller
     public function index(Request $request)
     {
         $query = Property::where('status', 'active')
-            ->with(['category', 'destination.state', 'roomTypes', 'collections']);
+            ->with(['category', 'destination.state', 'roomTypes', 'collections', 'amenities']);
 
         // Filter by Destination Slug
         if ($request->filled('destination')) {
@@ -150,6 +150,13 @@ class PropertyController extends Controller
                 'category_slug' => $prop->category->slug ?? null,
                 'destination' => $prop->destination->name ?? null,
                 'destination_slug' => $prop->destination->slug ?? null,
+                'amenities' => $prop->amenities->map(function ($amenity) {
+                    return [
+                        'id' => $amenity->id,
+                        'name' => $amenity->name,
+                        'icon' => $amenity->icon ? url(Storage::url($amenity->icon)) : null
+                    ];
+                }),
             ];
         });
 
@@ -361,7 +368,7 @@ class PropertyController extends Controller
                 $query->where('destination_id', $property->destination_id)
                     ->orWhere('category_id', $property->category_id);
             })
-            ->with(['category', 'destination.state', 'roomTypes'])
+            ->with(['category', 'destination.state', 'roomTypes', 'amenities'])
             ->limit(4)
             ->get();
 
@@ -392,6 +399,13 @@ class PropertyController extends Controller
                 'state_name' => $prop->destination->state->name ?? $prop->state,
                 'price' => $prop->amount  ?? '0.00',
                 'rating' => $prop->average_rating ?? '4.90',
+                'amenities' => $prop->amenities->map(function ($amenity) {
+                    return [
+                        'id' => $amenity->id,
+                        'name' => $amenity->name,
+                        'icon' => $amenity->icon ? url(Storage::url($amenity->icon)) : null
+                    ];
+                }),
             ]);
         });
 

@@ -127,7 +127,8 @@ class DiscoveryController extends Controller
             ->with([
                 'roomTypes' => function ($q) {
                     $q->select('property_id', 'base_price')->orderBy('base_price', 'asc');
-                }
+                },
+                'amenities'
             ]);
 
         if ($request->filled('destination')) {
@@ -175,7 +176,14 @@ class DiscoveryController extends Controller
                         'price' => $minPrice,
                         'amount' => $prop->amount ?? 0,
                         'image' => $mainImage,
-                        'images' => $galleryImages
+                        'images' => $galleryImages,
+                        'amenities' => $prop->amenities->map(function ($amenity) {
+                            return [
+                                'id' => $amenity->id,
+                                'name' => $amenity->name,
+                                'icon' => $amenity->icon ? url(Storage::url($amenity->icon)) : null
+                            ];
+                        })
                     ];
                 })
             ];
@@ -260,6 +268,7 @@ class DiscoveryController extends Controller
         $properties = Property::where('destination_id', $destination->id)
             ->where('show_in_menu', 1)
             ->where('status', 'active')
+            ->with('amenities')
             ->select('id', 'name', 'slug', 'total_bedrooms', 'total_bathrooms', 'max_guests', 'city', 'state', 'gallery', 'average_rating', 'amount')
             ->get()
             ->map(function ($prop) {
@@ -285,6 +294,13 @@ class DiscoveryController extends Controller
                     'amount' => $prop->amount ?? 0,
                     'image' => $gallery->first()['image'] ?? null,
                     'images' => $gallery,
+                    'amenities' => $prop->amenities->map(function ($amenity) {
+                        return [
+                            'id' => $amenity->id,
+                            'name' => $amenity->name,
+                            'icon' => $amenity->icon ? url(Storage::url($amenity->icon)) : null
+                        ];
+                    }),
                 ];
             });
 
@@ -364,6 +380,7 @@ class DiscoveryController extends Controller
         $properties = Property::where('category_id', $category->id)
             ->where('show_in_menu', 1)
             ->where('status', 'active')
+            ->with('amenities')
             ->select('id', 'name', 'slug', 'total_bedrooms', 'total_bathrooms', 'max_guests', 'city', 'state', 'gallery', 'average_rating', 'amount')
             ->get()
             ->map(function ($prop) {
@@ -389,6 +406,13 @@ class DiscoveryController extends Controller
                     'amount' => $prop->amount ?? 0,
                     'image' => $gallery->first()['image'] ?? null,
                     'images' => $gallery,
+                    'amenities' => $prop->amenities->map(function ($amenity) {
+                        return [
+                            'id' => $amenity->id,
+                            'name' => $amenity->name,
+                            'icon' => $amenity->icon ? url(Storage::url($amenity->icon)) : null
+                        ];
+                    }),
                 ];
             });
 

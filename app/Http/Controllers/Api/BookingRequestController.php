@@ -38,14 +38,26 @@ class BookingRequestController extends Controller
     {
         $validated = $request->validate([
             'property_id' => 'required|exists:properties,id',
-            'name'        => 'required|string|max:255',
-            'email'       => 'required|email|max:255',
-            'phone'       => 'nullable|string|max:20',
             'check_in'    => 'required|date|after_or_equal:today',
             'check_out'   => 'required|date|after:check_in',
-            'adults'      => 'nullable|integer|min:1|max:50',
+            'total_amount'=> 'required|numeric|min:0',
+            'subtotal'    => 'required|numeric|min:0',
+            'discount'    => 'nullable|numeric|min:0',
+            'gst'         => 'nullable|numeric|min:0',
+            'adults'      => 'required|integer|min:1|max:50',
+            'children'    => 'nullable|integer|min:0|max:50',
+            'room_type_id'=> 'nullable|exists:room_types,id',
+            'coupon_code' => 'nullable|string|max:100',
             'message'     => 'nullable|string|max:1000',
         ]);
+
+        $user = $request->user();
+        if (!$user) {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Unauthenticated.',
+            ], 401);
+        }
 
         $property = Property::findOrFail($validated['property_id']);
 
@@ -57,16 +69,24 @@ class BookingRequestController extends Controller
         }
 
         $bookingRequest = BookingRequest::create([
-            'property_id' => $property->id,
-            'vendor_id'   => $property->vendor_id,
-            'name'        => $validated['name'],
-            'email'       => $validated['email'],
-            'phone'       => $validated['phone'] ?? null,
-            'check_in'    => $validated['check_in'],
-            'check_out'   => $validated['check_out'],
-            'adults'      => $validated['adults'] ?? 1,
-            'message'     => $validated['message'] ?? null,
-            'status'      => 'pending',
+            'property_id'  => $property->id,
+            'vendor_id'    => $property->vendor_id,
+            'user_id'      => $user->id,
+            'name'         => $user->name,
+            'email'        => $user->email,
+            'phone'        => $user->phone,
+            'check_in'     => $validated['check_in'],
+            'check_out'    => $validated['check_out'],
+            'total_amount' => $validated['total_amount'],
+            'subtotal'     => $validated['subtotal'],
+            'discount'     => $validated['discount'] ?? 0,
+            'gst'          => $validated['gst'] ?? 0,
+            'adults'       => $validated['adults'],
+            'children'     => $validated['children'] ?? 0,
+            'room_type_id' => $validated['room_type_id'] ?? null,
+            'coupon_code'  => $validated['coupon_code'] ?? null,
+            'message'      => $validated['message'] ?? null,
+            'status'       => 'pending',
         ]);
 
         return response()->json([

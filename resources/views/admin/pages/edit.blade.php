@@ -73,6 +73,7 @@
         }
 
         .remove-btn {
+            display: none !important; /* Hidden as per request */
             background: none;
             border: none;
             color: var(--danger);
@@ -198,6 +199,7 @@
             <div style="margin-bottom: 2rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <h3 style="font-size: 1.125rem; font-weight: 600; color: var(--text-main);">Page Content Builder</h3>
+                    {{-- Commented out Add Section button as per request
                     <div class="block-selector">
                         <button type="button" class="block-selector-btn"
                             onclick="document.getElementById('blockOptions').classList.toggle('show')">
@@ -224,6 +226,7 @@
                             <button type="button" class="block-option-btn" data-type="multi_text">📝 Multi-Text Section</button>
                         </div>
                     </div>
+                    --}}
                 </div>
 
                 <div id="sections-container">
@@ -252,7 +255,7 @@
                                     <label class="form-label">Section Key (Unique ID) <span
                                             style="color:var(--danger)">*</span></label>
                                     <input type="text" name="sections[{{ $index }}][key]" value="{{ $section['key'] ?? '' }}"
-                                        class="form-input" placeholder="e.g. hero_banner" required>
+                                        class="form-input" placeholder="e.g. hero_banner" required readonly style="background-color: #f1f5f9; cursor: not-allowed;">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Block Title (Optional)</label>
@@ -841,7 +844,7 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div class="form-group">
                                     <label class="form-label">Section Key (Unique ID) <span style="color:var(--danger)">*</span></label>
-                                    <input type="text" name="sections[${sectionIndex}][key]" class="form-input" placeholder="e.g. hero_banner" required>
+                                    <input type="text" name="sections[${sectionIndex}][key]" class="form-input" placeholder="e.g. hero_banner" required readonly style="background-color: #f1f5f9; cursor: not-allowed;">
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Block Title (Optional)</label>

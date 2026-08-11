@@ -53,6 +53,14 @@
                 @endforeach
             </select>
         </div>
+        <div class="filter-group">
+            <label>Start Date</label>
+            <input type="date" name="start_date" value="{{ request('start_date') }}" style="padding:0.55rem 0.9rem; border:1px solid var(--border); border-radius:0.5rem; font-size:0.875rem; background:white;">
+        </div>
+        <div class="filter-group">
+            <label>End Date</label>
+            <input type="date" name="end_date" value="{{ request('end_date') }}" style="padding:0.55rem 0.9rem; border:1px solid var(--border); border-radius:0.5rem; font-size:0.875rem; background:white;">
+        </div>
         <button type="submit" style="padding:0.55rem 1.25rem; background:var(--primary); color:white; border:none; border-radius:0.5rem; font-weight:600; cursor:pointer;">Filter</button>
         <a href="{{ route('vendor.booking-requests.index') }}" style="padding:0.55rem 1rem; background:#f1f5f9; color:var(--text-main); border-radius:0.5rem; font-size:0.875rem; text-decoration:none; font-weight:500;">Clear</a>
     </form>
@@ -74,7 +82,12 @@
                 <div class="req-card-header">
                     <div>
                         <div class="req-name">{{ $req->name }}</div>
-                        <div class="req-prop">{{ $req->property->name ?? '—' }}</div>
+                        <div class="req-prop">
+                            {{ $req->property->name ?? '—' }}
+                            @if($req->roomType)
+                                <span style="color:var(--primary); font-weight:600; margin-left:0.25rem;">({{ $req->roomType->name }})</span>
+                            @endif
+                        </div>
                     </div>
                     <span class="badge badge-{{ $req->status }}">{{ ucfirst($req->status) }}</span>
                 </div>
@@ -96,7 +109,23 @@
                 <div class="req-row">
                     <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                     {{ $req->adults }} adult{{ $req->adults > 1 ? 's' : '' }}
+                    @if($req->children > 0)
+                         / {{ $req->children }} child{{ $req->children > 1 ? 'ren' : '' }}
+                    @endif
                 </div>
+                <div class="req-row" style="font-weight:600; color:var(--text-main); margin-top:0.25rem;">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+                    Price: ₹{{ number_format($req->total_amount, 2) }}
+                    <span style="font-weight:400; font-size:0.75rem; color:var(--text-muted); margin-left:0.5rem;">
+                        (Sub: ₹{{ number_format($req->subtotal, 2) }} @if($req->discount > 0) -₹{{ number_format($req->discount, 2) }} @endif)
+                    </span>
+                </div>
+                @if($req->coupon_code)
+                    <div class="req-row" style="font-size:0.78rem; color:var(--success); font-weight:600;">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82zM7 7h.01"/></svg>
+                        Coupon: {{ $req->coupon_code }}
+                    </div>
+                @endif
 
                 @if($req->message)
                     <div class="req-msg">{{ $req->message }}</div>

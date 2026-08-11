@@ -23,6 +23,12 @@ class BookingRequestController extends Controller
         if ($request->filled('property_id')) {
             $query->where('property_id', $request->property_id);
         }
+        if ($request->filled('start_date')) {
+            $query->where('check_in', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->where('check_in', '<=', $request->end_date);
+        }
 
         $requests = $query->paginate(20)->withQueryString();
 

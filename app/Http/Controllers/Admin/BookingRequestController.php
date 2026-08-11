@@ -15,6 +15,15 @@ class BookingRequestController extends Controller
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
+        if ($request->filled('property_id')) {
+            $query->where('property_id', $request->property_id);
+        }
+        if ($request->filled('start_date')) {
+            $query->where('check_in', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->where('check_in', '<=', $request->end_date);
+        }
         if ($request->filled('search')) {
             $s = $request->search;
             $query->where(function ($q) use ($s) {
@@ -25,8 +34,9 @@ class BookingRequestController extends Controller
         }
 
         $requests = $query->paginate(20)->withQueryString();
+        $properties = \App\Models\Property::select('id', 'name')->orderBy('name')->get();
 
-        return view('admin.booking-requests.index', compact('requests'));
+        return view('admin.booking-requests.index', compact('requests', 'properties'));
     }
 
     public function updateStatus(Request $request, BookingRequest $bookingRequest)
