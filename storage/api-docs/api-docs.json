@@ -2093,6 +2093,14 @@
                         "schema": {
                             "type": "integer"
                         }
+                    },
+                    {
+                        "name": "amenities",
+                        "in": "query",
+                        "description": "Comma-separated amenity IDs e.g. 1,3,5",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {

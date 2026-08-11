@@ -23,6 +23,7 @@ class PropertyController extends Controller
     #[OA\Parameter(name: "lng", in: "query", schema: new OA\Schema(type: "number", format: "float"))]
     #[OA\Parameter(name: "radius", in: "query", description: "Radius in km (default 50)", schema: new OA\Schema(type: "number", format: "float"))]
     #[OA\Parameter(name: "bedrooms", in: "query", schema: new OA\Schema(type: "integer"))]
+    #[OA\Parameter(name: "amenities", in: "query", description: "Comma-separated amenity IDs e.g. 1,3,5", schema: new OA\Schema(type: "string"))]
     #[OA\Response(
         response: 200,
         description: "Paginated list of properties with full details",
@@ -79,6 +80,16 @@ class PropertyController extends Controller
         // Filter by Bedrooms/BHK
         if ($request->filled('bedrooms')) {
             $query->where('total_bedrooms', $request->bedrooms);
+        }
+
+        // Filter by Amenities (comma-separated IDs)
+        if ($request->filled('amenities')) {
+            $ids = array_filter(array_map('intval', explode(',', $request->amenities)));
+            if (!empty($ids)) {
+                foreach ($ids as $amenityId) {
+                    $query->whereHas('amenities', fn($q) => $q->where('amenities.id', $amenityId));
+                }
+            }
         }
 
         // Geo-radius Search (Haversine Formula)
