@@ -56,6 +56,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::resource('pages', \App\Http\Controllers\Admin\PageController::class)->names('admin.pages');
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class)->names('admin.categories');
     Route::resource('amenities', \App\Http\Controllers\Admin\AmenityController::class)->names('admin.amenities');
+    Route::resource('meals', \App\Http\Controllers\Admin\MealController::class)->names('admin.meals');
     Route::resource('states', \App\Http\Controllers\Admin\StateController::class)->names('admin.states');
     Route::resource('destinations', \App\Http\Controllers\Admin\DestinationController::class)->names('admin.destinations');
     Route::post('blogs/upload', [\App\Http\Controllers\Admin\BlogController::class, 'uploadImage'])->name('admin.blogs.upload');

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Vendor;
 use App\Models\Property;
 use App\Models\Booking;
+use App\Models\BookingRequest;
 use App\Models\User;
 use App\Models\Contact;
 use App\Models\VendorWallet;
@@ -47,6 +48,8 @@ class DashboardController extends Controller
             'total_bookings'         => Booking::count(),
             'paid_bookings'          => Booking::where('payment_status', 'paid')->count(),
             'pending_bookings'       => Booking::where('payment_status', 'pending')->count(),
+            'total_booking_requests' => BookingRequest::count(),
+            'pending_booking_requests' => BookingRequest::where('status', 'pending')->count(),
             'refunded_bookings'      => Booking::where('payment_status', 'refunded')->count(),
             'total_customers'        => User::where('role', 'customer')->count(),
             'pending_verifications'  => Vendor::where('kyc_status', 'pending')->count(),
@@ -138,6 +141,9 @@ class DashboardController extends Controller
         $recentBookings = Booking::with(['customer', 'property', 'vendor'])
             ->latest()->limit(6)->get();
 
+        $recentBookingRequests = BookingRequest::with(['property', 'vendor.user', 'roomType'])
+            ->latest()->limit(6)->get();
+
         // ── Enquiries per month (last 6) ─────────────────────────────────────
         $enquiryLabels  = [];
         $enquiryData    = [];
@@ -166,6 +172,7 @@ class DashboardController extends Controller
             'statusDist',
             'topVendors',
             'recentBookings',
+            'recentBookingRequests',
             'enquiryLabels', 'enquiryData'
         ));
     }

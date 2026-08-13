@@ -668,41 +668,62 @@
                             "schema": {
                                 "required": [
                                     "property_id",
-                                    "name",
-                                    "email",
                                     "check_in",
-                                    "check_out"
+                                    "check_out",
+                                    "total_amount",
+                                    "subtotal",
+                                    "adults"
                                 ],
                                 "properties": {
                                     "property_id": {
                                         "type": "integer",
                                         "example": 1
                                     },
-                                    "name": {
-                                        "type": "string",
-                                        "example": "Rahul Sharma"
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "example": "rahul@example.com"
-                                    },
-                                    "phone": {
-                                        "type": "string",
-                                        "example": "+919876543210"
-                                    },
                                     "check_in": {
                                         "type": "string",
                                         "format": "date",
-                                        "example": "2026-09-01"
+                                        "example": "2026-06-01"
                                     },
                                     "check_out": {
                                         "type": "string",
                                         "format": "date",
-                                        "example": "2026-09-05"
+                                        "example": "2026-06-05"
+                                    },
+                                    "total_amount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 5000
+                                    },
+                                    "subtotal": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 4500
+                                    },
+                                    "discount": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 500
+                                    },
+                                    "gst": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 500
                                     },
                                     "adults": {
                                         "type": "integer",
                                         "example": 2
+                                    },
+                                    "children": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "room_type_id": {
+                                        "type": "integer",
+                                        "example": 5
+                                    },
+                                    "coupon_code": {
+                                        "type": "string",
+                                        "example": "SAVE10"
                                     },
                                     "message": {
                                         "type": "string",
@@ -2345,14 +2366,44 @@
                     "content": {
                         "application/json": {
                             "schema": {
+                                "required": [
+                                    "booking_id",
+                                    "ratings",
+                                    "comment"
+                                ],
                                 "properties": {
-                                    "rating": {
-                                        "type": "integer",
-                                        "example": 4
+                                    "booking_id": {
+                                        "type": "string",
+                                        "example": "BK-0982"
                                     },
                                     "comment": {
                                         "type": "string",
-                                        "example": "Updated review"
+                                        "example": "Amazing stay! Loved the view."
+                                    },
+                                    "ratings": {
+                                        "properties": {
+                                            "amenities": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "cleanliness": {
+                                                "type": "integer",
+                                                "example": 4
+                                            },
+                                            "communication": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "location": {
+                                                "type": "integer",
+                                                "example": 4
+                                            },
+                                            "value": {
+                                                "type": "integer",
+                                                "example": 5
+                                            }
+                                        },
+                                        "type": "object"
                                     }
                                 },
                                 "type": "object"

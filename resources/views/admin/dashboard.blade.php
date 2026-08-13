@@ -180,6 +180,16 @@ canvas { max-width: 100%; }
         <div class="kpi-sub">Customer contact requests</div>
     </div>
 
+    {{-- Booking Requests --}}
+    <div class="kpi-card" style="--kpi-color:#14b8a6;--kpi-bg:#f0fdfa;">
+        <div class="kpi-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </div>
+        <div class="kpi-label">Booking Requests</div>
+        <div class="kpi-value" style="color:#14b8a6;">{{ number_format($stats['total_booking_requests']) }}</div>
+        <div class="kpi-sub">{{ $stats['pending_booking_requests'] }} pending requests</div>
+    </div>
+
     {{-- Refunded --}}
     <div class="kpi-card" style="--kpi-color:#ef4444;--kpi-bg:#fef2f2;">
         <div class="kpi-icon">
@@ -384,6 +394,58 @@ canvas { max-width: 100%; }
         </div>
     </div>
 
+</div>
+
+{{-- Booking Requests --}}
+<div class="chart-grid" style="margin-bottom:1.5rem;">
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <h3>Recent Booking Requests</h3>
+            <a href="{{ route('admin.booking-requests.index') }}" style="font-size:0.8rem;color:var(--primary);text-decoration:none;font-weight:600;">View All</a>
+        </div>
+        <div class="chart-body" style="padding:0.5rem 1.5rem 1.25rem;">
+            @forelse($recentBookingRequests as $request)
+                <div class="recent-row">
+                    <div class="recent-id">#{{ $request->id }}</div>
+                    <div class="recent-info">
+                        <div class="recent-name">{{ $request->name }}</div>
+                        <div class="recent-prop">
+                            {{ $request->property->name ?? 'N/A' }}
+                            @if($request->roomType)
+                                · {{ $request->roomType->name }}
+                            @endif
+                        </div>
+                        <div class="recent-prop">
+                            {{ $request->check_in->format('d M Y') }} to {{ $request->check_out->format('d M Y') }}
+                            · {{ $request->adults }} adult{{ $request->adults > 1 ? 's' : '' }}
+                            @if($request->children > 0)
+                                , {{ $request->children }} child{{ $request->children > 1 ? 'ren' : '' }}
+                            @endif
+                        </div>
+                    </div>
+                    <div style="text-align:right;">
+                        <div class="recent-amt">₹{{ number_format($request->total_amount) }}</div>
+                        <div style="font-size:0.7rem;margin-top:2px;text-transform:capitalize;color:#0f766e;font-weight:700;">{{ $request->status }}</div>
+                    </div>
+                </div>
+            @empty
+                <p style="color:var(--text-muted);font-size:0.875rem;padding:1rem 0;">No booking requests yet.</p>
+            @endforelse
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <div class="chart-card-header">
+            <h3>Request Summary</h3>
+            <span>Leads from property pages</span>
+        </div>
+        <div class="chart-body" style="display:flex;align-items:center;justify-content:center;min-height:220px;">
+            <a href="{{ route('admin.booking-requests.index') }}" style="display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1.1rem;background:#f0fdfa;border-radius:0.75rem;border:1px solid #ccfbf1;text-decoration:none;color:#0f766e;font-weight:700;font-size:0.875rem;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                Manage Booking Requests
+            </a>
+        </div>
+    </div>
 </div>
 
 @endsection

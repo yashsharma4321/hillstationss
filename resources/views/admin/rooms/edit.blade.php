@@ -12,10 +12,6 @@
     .form-label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 0.5rem; color: var(--text-main); }
     .form-input { width: 100%; padding: 0.75rem; border: 1px solid var(--border); border-radius: 0.5rem; font-family: inherit; font-size: 0.875rem; background: white; }
     .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
-    .meal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 0.5rem; }
-    .meal-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; cursor: pointer; background: #f8fafc; padding: 0.6rem 0.75rem; border-radius: 0.4rem; border: 1px solid var(--border); transition: background 0.15s; }
-    .meal-item:hover { background: #e0e7ff; }
-    .meal-item input { accent-color: var(--primary); width: 1rem; height: 1rem; }
     .existing-images-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 1rem; }
     .existing-img-card { background: white; border: 1px solid var(--border); border-radius: 0.6rem; overflow: hidden; position: relative; }
     .existing-img-card img { width: 100%; height: 120px; object-fit: cover; display: block; }
@@ -87,24 +83,6 @@
                     <span>Room is Active</span>
                 </label>
             </div>
-        </div>
-    </div>
-
-    {{-- MEAL PLANS --}}
-    <div class="form-section">
-        <h3 class="section-title">
-            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            Meal Plans Included
-        </h3>
-        @php $currentMeals = old('meals', $room->meals ?? []); @endphp
-        <div class="meal-grid">
-            @foreach(['Breakfast','Lunch','Dinner','All Inclusive','Breakfast & Dinner','No Meals','Veg','Non-Veg','Jain'] as $meal)
-                <label class="meal-item">
-                    <input type="checkbox" name="meals[]" value="{{ $meal }}"
-                           {{ in_array($meal, $currentMeals) ? 'checked' : '' }}>
-                    {{ $meal }}
-                </label>
-            @endforeach
         </div>
     </div>
 

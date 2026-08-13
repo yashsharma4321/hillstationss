@@ -486,6 +486,16 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('admin.meals.index') }}"
+                        class="{{ request()->routeIs('admin.meals.*') ? 'active' : '' }}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 20A7 7 0 0 1 4 13V8h14v5a7 7 0 0 1-7 7Z"/><path d="M11 20v4"/><path d="M8 24h6"/><path d="M7 3h8"/><path d="M8 8V3"/><path d="M14 8V3"/>
+                        </svg>
+                        <span>Meals</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('admin.bookings.index') }}"
                         class="{{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"

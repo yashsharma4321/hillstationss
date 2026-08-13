@@ -129,6 +129,13 @@ class PropertyController extends Controller
             $property->collections()->sync($request->collections);
         }
 
+        // Handle Meals Relation
+        if ($request->has('meals')) {
+            $mealNames = $request->input('meals', []);
+            $mealIds = \App\Models\Meal::whereIn('name', $mealNames)->pluck('id');
+            $property->mealTypes()->sync($mealIds);
+        }
+
         // Handle inline Rooms
         if ($request->has('rooms')) {
             foreach ($request->input('rooms', []) as $idx => $roomData) {
@@ -254,6 +261,11 @@ class PropertyController extends Controller
 
         $property->amenities()->sync($request->amenities ?? []);
         $property->collections()->sync($request->collections ?? []);
+
+        // Handle Meals Relation
+        $mealNames = $request->input('meals', []);
+        $mealIds = \App\Models\Meal::whereIn('name', $mealNames)->pluck('id');
+        $property->mealTypes()->sync($mealIds);
 
         // Handle Gallery
         $gallery = $property->gallery ?? [];

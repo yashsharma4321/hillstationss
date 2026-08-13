@@ -404,11 +404,6 @@
         margin-bottom: 0.5rem;
     }
 
-    .room-card-item .room-meals {
-        font-size: 0.75rem;
-        color: #4f46e5;
-        margin-bottom: 0.5rem;
-    }
 
     .room-card-item .room-meta {
         font-size: 0.75rem;
@@ -908,7 +903,7 @@
 
             <div class="form-group full-width">
                 <label class="form-label">Description</label>
-                <textarea name="description" rows="4" class="form-input" placeholder="Tell us about the property...">{{ old('description', $property->description) }}</textarea>
+                <textarea name="description" id="property-description-editor" rows="4" class="form-input" placeholder="Tell us about the property...">{{ old('description', $property->description) }}</textarea>
             </div>
         </div>
     </div>
@@ -1313,9 +1308,6 @@
                         @if($room->bed_type)
                             <div class="room-bed">🛏 {{ $room->bed_type }}</div>
                         @endif
-                        @if(!empty($room->meals))
-                            <div class="room-meals">🍽 {{ implode(', ', $room->meals) }}</div>
-                        @endif
                         <div class="room-meta">
                             {{ count($room->images ?? []) }} image(s)
                             &nbsp;•&nbsp;
@@ -1339,7 +1331,14 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 <script>
+    CKEDITOR.replace('property-description-editor', {
+        height: 260,
+        removeButtons: 'About',
+        allowedContent: true
+    });
+
     // Preview logic for new images
     document.getElementById('images-input').addEventListener('change', function(e) {
         const container = document.getElementById('image-preview-container');

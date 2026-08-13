@@ -91,4 +91,9 @@ class Property extends Model
     {
         return $this->hasMany(\App\Models\Booking::class);
     }
+
+    public function mealTypes(): BelongsToMany
+    {
+        return $this->belongsToMany(Meal::class, 'meal_property');
+    }
 }

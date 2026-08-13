@@ -787,7 +787,7 @@
 
             <div class="form-group full-width">
                 <label class="form-label">Description</label>
-                <textarea name="description" rows="4" class="form-input" placeholder="Tell us about the property...">{{ old('description') }}</textarea>
+                <textarea name="description" id="property-description-editor" rows="4" class="form-input" placeholder="Tell us about the property...">{{ old('description') }}</textarea>
             </div>
         </div>
     </div>
@@ -1044,7 +1044,14 @@
 @endsection
 
 @section('scripts')
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 <script>
+    CKEDITOR.replace('property-description-editor', {
+        height: 260,
+        removeButtons: 'About',
+        allowedContent: true
+    });
+
     // ── Property Gallery preview ──────────────────────────────────────────
     document.getElementById('gallery-input').addEventListener('change', function(e) {
         const container = document.getElementById('gallery-preview');
@@ -1082,12 +1089,6 @@
         const container = document.getElementById('rooms-container');
 
         const bedOptions = BED_TYPES.map(b => `<option value="${b}">${b}</option>`).join('');
-        const mealCheckboxes = MEAL_OPTIONS.map(m =>
-            `<label class="meal-item">
-                <input type="checkbox" name="rooms[${idx}][meals][]" value="${m}"> ${m}
-            </label>`
-        ).join('');
-
         const card = document.createElement('div');
         card.className = 'room-card';
         card.id = `room-card-${idx}`;
@@ -1118,11 +1119,6 @@
                     <label class="form-label">Room Description</label>
                     <textarea name="rooms[${idx}][description]" rows="2" class="form-input" placeholder="Describe this room..."></textarea>
                 </div>
-            </div>
-
-            <div style="margin-bottom:1.25rem;">
-                <label class="form-label" style="margin-bottom:0.5rem;">Meal Plans Included</label>
-                <div class="meal-grid">${mealCheckboxes}</div>
             </div>
 
             <div>

@@ -132,6 +132,13 @@ class PropertyController extends Controller
             $property->collections()->sync($request->collections);
         }
 
+        // Handle Meals Relation
+        if ($request->has('meals')) {
+            $mealNames = $request->input('meals', []);
+            $mealIds = \App\Models\Meal::whereIn('name', $mealNames)->pluck('id');
+            $property->mealTypes()->sync($mealIds);
+        }
+
         // Handle Special Dates
         if ($request->has('special_dates')) {
             $property->specialDates()->delete();
@@ -269,6 +276,11 @@ class PropertyController extends Controller
 
         // Handle Collections
         $property->collections()->sync($request->collections ?? []);
+
+        // Handle Meals Relation
+        $mealNames = $request->input('meals', []);
+        $mealIds = \App\Models\Meal::whereIn('name', $mealNames)->pluck('id');
+        $property->mealTypes()->sync($mealIds);
 
         // Handle Special Dates
         $property->specialDates()->delete();

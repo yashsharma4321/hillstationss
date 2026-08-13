@@ -19,16 +19,20 @@ class BookingRequestController extends Controller
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
-            required: ["property_id", "name", "email", "check_in", "check_out"],
+            required: ["property_id", "check_in", "check_out", "total_amount", "subtotal", "adults"],
             properties: [
-                new OA\Property(property: "property_id",  type: "integer", example: 1),
-                new OA\Property(property: "name",         type: "string",  example: "Rahul Sharma"),
-                new OA\Property(property: "email",        type: "string",  example: "rahul@example.com"),
-                new OA\Property(property: "phone",        type: "string",  example: "+919876543210"),
-                new OA\Property(property: "check_in",     type: "string",  format: "date", example: "2026-09-01"),
-                new OA\Property(property: "check_out",    type: "string",  format: "date", example: "2026-09-05"),
-                new OA\Property(property: "adults",       type: "integer", example: 2),
-                new OA\Property(property: "message",      type: "string",  example: "We are a family of 4."),
+                new OA\Property(property: "property_id", type: "integer", example: 1),
+                new OA\Property(property: "check_in", type: "string", format: "date", example: "2026-06-01"),
+                new OA\Property(property: "check_out", type: "string", format: "date", example: "2026-06-05"),
+                new OA\Property(property: "total_amount", type: "number", format: "float", example: 5000),
+                new OA\Property(property: "subtotal", type: "number", format: "float", example: 4500),
+                new OA\Property(property: "discount", type: "number", format: "float", example: 500),
+                new OA\Property(property: "gst", type: "number", format: "float", example: 500),
+                new OA\Property(property: "adults", type: "integer", example: 2),
+                new OA\Property(property: "children", type: "integer", example: 1),
+                new OA\Property(property: "room_type_id", type: "integer", example: 5),
+                new OA\Property(property: "coupon_code", type: "string", example: "SAVE10"),
+                new OA\Property(property: "message", type: "string", example: "We are a family of 4."),
             ]
         )
     )]
@@ -97,6 +101,14 @@ class BookingRequestController extends Controller
                 'property'   => $property->name,
                 'check_in'   => $bookingRequest->check_in->format('Y-m-d'),
                 'check_out'  => $bookingRequest->check_out->format('Y-m-d'),
+                'total_amount' => $bookingRequest->total_amount,
+                'subtotal'   => $bookingRequest->subtotal,
+                'discount'   => $bookingRequest->discount,
+                'gst'        => $bookingRequest->gst,
+                'adults'     => $bookingRequest->adults,
+                'children'   => $bookingRequest->children,
+                'room_type_id' => $bookingRequest->room_type_id,
+                'coupon_code' => $bookingRequest->coupon_code,
                 'status'     => $bookingRequest->status,
             ],
         ], 201);

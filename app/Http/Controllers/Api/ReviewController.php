@@ -212,18 +212,36 @@ class ReviewController extends Controller
     #[OA\RequestBody(
         required: true,
         content: new OA\JsonContent(
+            required: ["booking_id", "ratings", "comment"],
             properties: [
-                new OA\Property(property: "rating", type: "integer", example: 4),
-                new OA\Property(property: "comment", type: "string", example: "Updated review"),
+                new OA\Property(property: "booking_id", type: "string", example: "BK-0982"),
+                new OA\Property(property: "comment", type: "string", example: "Amazing stay! Loved the view."),
+                new OA\Property(
+                    property: "ratings",
+                    type: "object",
+                    properties: [
+                        new OA\Property(property: "amenities", type: "integer", example: 5),
+                        new OA\Property(property: "cleanliness", type: "integer", example: 4),
+                        new OA\Property(property: "communication", type: "integer", example: 5),
+                        new OA\Property(property: "location", type: "integer", example: 4),
+                        new OA\Property(property: "value", type: "integer", example: 5),
+                    ]
+                ),
             ]
         )
     )]
     #[OA\Response(response: 200, description: "Review updated")]
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'rating' => 'sometimes|required|integer|min:1|max:5',
-            'comment' => 'nullable|string|max:1000',
+        $validated = $request->validate([
+            'booking_id'              => 'sometimes|required',
+            'comment'                 => 'nullable|string|max:1000',
+            'ratings'                 => 'required|array',
+            'ratings.amenities'       => 'required|integer|min:1|max:5',
+            'ratings.cleanliness'     => 'required|integer|min:1|max:5',
+            'ratings.communication'   => 'required|integer|min:1|max:5',
+            'ratings.location'        => 'required|integer|min:1|max:5',
+            'ratings.value'           => 'required|integer|min:1|max:5',
         ]);
 
         $review = Review::where('id', $id)
@@ -237,15 +255,61 @@ class ReviewController extends Controller
             ], 404);
         }
 
-        $review->update($request->only(['rating', 'comment']));
+        if ($request->filled('booking_id')) {
+            $bookingExists = Booking::where('id', $review->booking_id)
+                ->where('customer_id', auth()->id())
+                ->where(function ($q) use ($request) {
+                    $q->where('id', $request->booking_id)
+                      ->orWhere('booking_number', $request->booking_id);
+                })
+                ->exists();
+
+            if (!$bookingExists) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Booking not found or does not belong to this review.'
+                ], 404);
+            }
+        }
+
+        $ratings = $validated['ratings'];
+        $averageRating = round(
+            array_sum([$ratings['amenities'], $ratings['cleanliness'], $ratings['communication'], $ratings['location'], $ratings['value']]) / 5,
+            1
+        );
+
+        $review->update([
+            'rating'               => $averageRating,
+            'amenities_rating'     => $ratings['amenities'],
+            'cleanliness_rating'   => $ratings['cleanliness'],
+            'communication_rating' => $ratings['communication'],
+            'location_rating'      => $ratings['location'],
+            'value_rating'         => $ratings['value'],
+            'comment'              => $validated['comment'] ?? null,
+        ]);
 
         // Update property average rating
         $this->updatePropertyRating($review->property_id);
 
+        $review = $review->fresh()->load('booking.property');
+
         return response()->json([
             'status' => 'success',
             'message' => 'Review updated successfully!',
-            'data' => $review->fresh()
+            'data' => [
+                'id'             => $review->id,
+                'booking_id'     => $review->booking->booking_number ?? $review->booking_id,
+                'property_name'  => $review->booking->property->name ?? null,
+                'ratings'        => [
+                    'amenities'     => $review->amenities_rating,
+                    'cleanliness'   => $review->cleanliness_rating,
+                    'communication' => $review->communication_rating,
+                    'location'      => $review->location_rating,
+                    'value'         => $review->value_rating,
+                ],
+                'comment'        => $review->comment,
+                'average_rating' => number_format($review->rating, 1),
+            ]
         ]);
     }
 

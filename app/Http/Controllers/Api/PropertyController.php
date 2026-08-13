@@ -210,6 +210,7 @@ class PropertyController extends Controller
                 'vendor.user',
                 'cancellationRules',
                 'specialDates',
+                'mealTypes',
             ])
             ->first();
 
@@ -315,6 +316,12 @@ class PropertyController extends Controller
             ],
             // Meals from the property's own meals field
             'meals' => $property->meals ?? [],
+            // Master table meal types
+            'meal_types' => $property->mealTypes->map(fn($m) => [
+                'id' => $m->id,
+                'name' => $m->name,
+                'slug' => $m->slug,
+            ])->values(),
             // Collections this property belongs to
             'collections' => $property->collections->map(fn($c) => [
                 'id'      => $c->id,
