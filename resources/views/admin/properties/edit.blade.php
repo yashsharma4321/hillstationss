@@ -1011,6 +1011,28 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group full-width" style="border-top: 1.5px solid #f1f5f9; padding-top: 1.5rem; margin-top: 0.5rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1.5rem;">
+                    <div>
+                        <label class="form-label">Pets Allowed</label>
+                        <select name="pets_allowed" class="form-input" id="pets_allowed_select" onchange="togglePetChargeFields()">
+                            <option value="0" {{ old('pets_allowed', $property->pets_allowed) ? '' : 'selected' }}>No</option>
+                            <option value="1" {{ old('pets_allowed', $property->pets_allowed) ? 'selected' : '' }}>Yes</option>
+                        </select>
+                    </div>
+                    <div id="pet_charge_type_container" style="display: none;">
+                        <label class="form-label">Pet Charge Type</label>
+                        <select name="pet_charge_type" class="form-input" id="pet_charge_type_select" onchange="togglePetChargeAmountField()">
+                            <option value="free" {{ old('pet_charge_type', $property->pet_charge_type) == 'free' ? 'selected' : '' }}>Free / Non-Chargeable</option>
+                            <option value="chargeable" {{ old('pet_charge_type', $property->pet_charge_type) == 'chargeable' ? 'selected' : '' }}>Chargeable</option>
+                        </select>
+                    </div>
+                    <div id="pet_charge_container" style="display: none;">
+                        <label class="form-label">Pet Charge Amount</label>
+                        <input type="number" name="pet_charge" id="pet_charge_input" value="{{ old('pet_charge', $property->pet_charge) }}" class="form-input" min="0" step="0.01">
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1461,5 +1483,36 @@
         container.appendChild(row);
         sdIdx++;
     }
+
+    function togglePetChargeFields() {
+        const petsAllowed = document.getElementById('pets_allowed_select').value;
+        const typeContainer = document.getElementById('pet_charge_type_container');
+        const chargeContainer = document.getElementById('pet_charge_container');
+        
+        if (petsAllowed == '1') {
+            typeContainer.style.display = 'block';
+            togglePetChargeAmountField();
+        } else {
+            typeContainer.style.display = 'none';
+            chargeContainer.style.display = 'none';
+        }
+    }
+
+    function togglePetChargeAmountField() {
+        const chargeType = document.getElementById('pet_charge_type_select').value;
+        const chargeContainer = document.getElementById('pet_charge_container');
+        
+        if (chargeType === 'chargeable') {
+            chargeContainer.style.display = 'block';
+        } else {
+            chargeContainer.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (document.getElementById('pets_allowed_select')) {
+            togglePetChargeFields();
+        }
+    });
 </script>
 @endsection

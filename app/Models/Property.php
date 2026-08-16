@@ -14,7 +14,8 @@ class Property extends Model
         'total_bedrooms', 'total_bathrooms', 'max_guests', 'max_capacity', 'address', 'gallery',
         'city', 'state', 'zip_code', 'country', 'latitude', 'longitude', 
         'check_in_time', 'check_out_time', 'status', 'average_rating', 'show_on_homepage', 
-        'is_featured', 'show_in_menu', 'gst', 'extra_person_charge', 'instagram_videos', 'nearby_attractions', 'brochure', 'meals'
+        'is_featured', 'show_in_menu', 'gst', 'extra_person_charge', 'instagram_videos', 'nearby_attractions', 'brochure', 'meals',
+        'pets_allowed', 'pet_charge_type', 'pet_charge'
     ];
 
     protected $casts = [
@@ -25,6 +26,8 @@ class Property extends Model
         'show_in_menu' => 'boolean',
         'show_on_homepage' => 'boolean',
         'is_featured' => 'boolean',
+        'pets_allowed' => 'boolean',
+        'pet_charge' => 'decimal:2',
     ];
 
     public function destination(): BelongsTo
