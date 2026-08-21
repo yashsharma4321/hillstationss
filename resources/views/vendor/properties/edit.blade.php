@@ -98,6 +98,14 @@
                     <label class="form-label">Description</label>
                     <textarea name="description" rows="5" class="form-input">{{ old('description', $property->description) }}</textarea>
                 </div>
+                <div class="form-group full-width">
+                    <label class="form-label">House Rules</label>
+                    <textarea name="house_rules" rows="5" class="form-input">{{ old('house_rules', $property->house_rules) }}</textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label class="form-label">House Rules Description</label>
+                    <textarea name="house_rules_description" rows="5" class="form-input">{{ old('house_rules_description', $property->house_rules_description) }}</textarea>
+                </div>
             </div>
         </div>
 
@@ -313,6 +321,34 @@
             </button>
         </div>
 
+        <!-- THINGS TO DO -->
+        <div class="form-section">
+            <h3 class="section-title">Things To Do</h3>
+            <div id="things-to-do-container">
+                @php $tIdx = 0; @endphp
+                @if(is_array($property->things_to_do))
+                    @foreach($property->things_to_do as $t)
+                        <div class="dynamic-card" style="position: relative;">
+                            <button type="button" class="btn-remove" onclick="this.parentElement.remove()" style="position:absolute; top:1rem; right:1rem; width:24px; height:24px; border-radius:50%; background:#ef4444; color:#fff; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer;">&times;</button>
+                            <div style="display:grid; grid-template-columns:1fr; gap:1rem;">
+                                <div class="form-group full-width">
+                                    <label class="form-label">Title <span class="required-star">*</span></label>
+                                    <input type="text" name="things_to_do[{{$tIdx}}][title]" value="{{ $t['title'] ?? '' }}" class="form-input" placeholder="Title" required>
+                                </div>
+                                <div class="form-group full-width">
+                                    <label class="form-label">Description</label>
+                                    <textarea name="things_to_do[{{$tIdx}}][description]" class="form-input" rows="2" placeholder="Description">{{ $t['description'] ?? '' }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                        @php $tIdx++; @endphp
+                    @endforeach
+                @endif
+            </div>
+            <button type="button" onclick="addThingToDo()" class="btn-add" style="background:var(--bg-body); color:var(--text-main); border:2px dashed var(--border); box-shadow:none;">
+                + Add Thing To Do
+            </button>
+        </div>
         <!-- ROOMS -->
         <div class="form-section">
             <h3 class="section-title">Rooms & Units Builder</h3>
@@ -450,6 +486,21 @@
         `;
         document.getElementById('attractions-container').appendChild(div);
         aIdx++;
+    }
+
+    function addThingToDo() {
+        const div = document.createElement('div');
+        const idx = Date.now();
+        div.className = 'dynamic-card';
+        div.style.position = 'relative';
+        div.innerHTML = `
+            <button type="button" class="btn-remove" onclick="this.parentElement.remove()" style="position:absolute; top:1rem; right:1rem; width:24px; height:24px; border-radius:50%; background:#ef4444; color:#fff; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer;">&times;</button>
+            <div style="display:grid; grid-template-columns:1fr; gap:1rem;">
+                <div class="form-group full-width"><label class="form-label">Title <span class="required-star">*</span></label><input type="text" name="things_to_do[${idx}][title]" class="form-input" placeholder="Title" required></div>
+                <div class="form-group full-width"><label class="form-label">Description</label><textarea name="things_to_do[${idx}][description]" class="form-input" rows="2" placeholder="Description"></textarea></div>
+            </div>
+        `;
+        document.getElementById('things-to-do-container').appendChild(div);
     }
 
     let rIdx = 0;

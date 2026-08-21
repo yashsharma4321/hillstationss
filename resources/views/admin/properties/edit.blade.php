@@ -823,12 +823,591 @@
 @endsection
 
 @section('content')
+@if ($errors->any())
+    <div class="error-alert">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
+<form action="{{ route('admin.properties.update', $property) }}" method="POST" enctype="multipart/form-data">
+    @csrf
+    @method('PUT')
 
+    <!-- BASIC INFORMATION -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Basic Information
+        </h3>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label class="form-label">Property Name <span class="required-star">*</span></label>
+                <div style="display: flex; gap: 1rem;">
+                    <input type="text" name="name" value="{{ old('name', $property->name) }}" required class="form-input" placeholder="e.g. Hilltop Villa & Suites" style="flex: 2;">
+                </div>
+                @error('name') <p class="form-error">{{ $message }}</p> @enderror
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Category <span class="required-star">*</span></label>
+                <select name="category_id" required class="form-input">
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ old('category_id', $property->category_id) == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
+            <div class="form-group">
+                <label class="form-label">Destination <span class="required-star">*</span></label>
+                <select name="destination_id" required class="form-input">
+                    <option value="">Select Destination</option>
+                    @foreach($destinations as $destination)
+                        <option value="{{ $destination->id }}" {{ old('destination_id', $property->destination_id) == $destination->id ? 'selected' : '' }}>{{ $destination->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Assign to Vendor <span class="required-star">*</span></label>
+                <select name="vendor_id" required class="form-input">
+                    @foreach($vendors as $vendor)
+                        <option value="{{ $vendor->id }}" {{ old('vendor_id', $property->vendor_id) == $vendor->id ? 'selected' : '' }}>{{ $vendor->user->name }} ({{ $vendor->user->email }})</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group full-width">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:1.5rem;">
+                    <div>
+                        <label class="form-label">Total Bedrooms <span class="required-star">*</span></label>
+                        <input type="number" name="total_bedrooms" value="{{ old('total_bedrooms', $property->total_bedrooms) }}" required class="form-input" min="0">
+                    </div>
+                    <div>
+                        <label class="form-label">Total Bathrooms <span class="required-star">*</span></label>
+                        <input type="number" name="total_bathrooms" value="{{ old('total_bathrooms', $property->total_bathrooms) }}" required class="form-input" min="0">
+                    </div>
+                    <div>
+                        <label class="form-label">Max Guests <span class="required-star">*</span></label>
+                        <input type="number" name="max_guests" value="{{ old('max_guests', $property->max_guests) }}" required class="form-input" min="0">
+                    </div>
+                    <div>
+                        <label class="form-label">Max Capacity</label>
+                        <input type="number" name="max_capacity" value="{{ old('max_capacity', $property->max_capacity) }}" class="form-input" min="0" placeholder="Guests + Staff">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label class="form-label">Description</label>
+                <textarea name="description" id="property-description-editor" rows="4" class="form-input" placeholder="Tell us about the property...">{{ old('description', $property->description) }}</textarea>
+            </div>
+            <div class="form-group full-width">
+                <label class="form-label">House Rules</label>
+                <textarea name="house_rules" id="property-house-rules-editor" rows="4" class="form-input" placeholder="Enter house rules...">{{ old('house_rules', $property->house_rules) }}</textarea>
+            </div>
+            <div class="form-group full-width">
+                <label class="form-label">House Rules Description</label>
+                <textarea name="house_rules_description" id="property-house-rules-desc-editor" rows="4" class="form-input" placeholder="Enter house rules description...">{{ old('house_rules_description', $property->house_rules_description) }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOCATION DETAILS -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Location Details
+        </h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">City <span class="required-star">*</span></label>
+                <input type="text" name="city" value="{{ old('city', $property->city) }}" required class="form-input" placeholder="e.g. Panchgani">
+            </div>
+            <div class="form-group">
+                <label class="form-label">State <span class="required-star">*</span></label>
+                <input type="text" name="state" value="{{ old('state', $property->state) }}" required class="form-input" placeholder="e.g. Maharashtra">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Country <span class="required-star">*</span></label>
+                <input type="text" name="country" value="{{ old('country', $property->country) }}" required class="form-input">
+            </div>
+            <div class="form-group">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div>
+                        <label class="form-label">Latitude</label>
+                        <input type="text" name="latitude" value="{{ old('latitude', $property->latitude) }}" class="form-input" placeholder="e.g. 17.92">
+                    </div>
+                    <div>
+                        <label class="form-label">Longitude</label>
+                        <input type="text" name="longitude" value="{{ old('longitude', $property->longitude) }}" class="form-input" placeholder="e.g. 73.81">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPERATIONAL INFO -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Operational Info & Status
+        </h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div>
+                        <label class="form-label">Check-in After</label>
+                        <input type="time" name="check_in_time" value="{{ old('check_in_time', $property->check_in_time) }}" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Check-out Before</label>
+                        <input type="time" name="check_out_time" value="{{ old('check_out_time', $property->check_out_time) }}" class="form-input">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Publishing Status <span class="required-star">*</span></label>
+                <select name="status" required class="form-input">
+                    <option value="pending" {{ old('status', $property->status) == 'pending' ? 'selected' : '' }}>Pending Approval</option>
+                    <option value="active" {{ old('status', $property->status) == 'active' ? 'selected' : '' }}>Active / Live</option>
+                    <option value="inactive" {{ old('status', $property->status) == 'inactive' ? 'selected' : '' }}>Inactive / Hidden</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Property Brochure <span class="help-text">(PDF)</span></label>
+                <input type="file" name="brochure" accept="application/pdf" class="form-input">
+                @if($property->brochure)
+                    <div style="margin-top: 0.5rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg width="16" height="16" fill="none" stroke="#dc2626" stroke-width="2" viewBox="0 0 24 24"><path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        <a href="{{ Storage::url($property->brochure) }}" target="_blank" style="font-size: 0.8rem; color: #4338ca; text-decoration: underline; font-weight: 500;">View Current Brochure</a>
+                    </div>
+                @else
+                    <p style="color:#94a3b8; font-size:0.7rem; margin-top:0.25rem;">No brochure uploaded yet (Max 10MB)</p>
+                @endif
+            </div>
+            <div class="form-group">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div>
+                        <label class="form-label">GST %</label>
+                        <input type="number" name="gst" value="{{ old('gst', $property->gst) }}" class="form-input" min="0" step="0.01">
+                    </div>
+                    <div>
+                        <label class="form-label">Price / Amount</label>
+                        <input type="number" step="0.01" name="amount" value="{{ old('amount', $property->amount) }}" class="form-input" placeholder="Amount">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                    <div>
+                        <label class="form-label">Extra Person Charge</label>
+                        <input type="number" name="extra_person_charge" value="{{ old('extra_person_charge', $property->extra_person_charge) }}" class="form-input" min="0" step="0.01">
+                    </div>
+                    <div style="display: flex; align-items: flex-end; gap: 2rem; padding-bottom: 0.25rem;">
+                        <label class="checkbox-group">
+                            <input type="checkbox" name="show_on_homepage" value="1" {{ old('show_on_homepage', $property->show_on_homepage) ? 'checked' : '' }}>
+                            <span>Show on Homepage</span>
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" name="show_in_menu" value="1" {{ old('show_in_menu', $property->show_in_menu) ? 'checked' : '' }}>
+                            <span>Show in Menu</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group full-width" style="border-top: 1.5px solid #f1f5f9; padding-top: 1.5rem; margin-top: 0.5rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1.5rem;">
+                    <div>
+                        <label class="form-label">Pets Allowed</label>
+                        <select name="pets_allowed" class="form-input" id="pets_allowed_select" onchange="togglePetChargeFields()">
+                            <option value="0" {{ old('pets_allowed', $property->pets_allowed) ? '' : 'selected' }}>No</option>
+                            <option value="1" {{ old('pets_allowed', $property->pets_allowed) ? 'selected' : '' }}>Yes</option>
+                        </select>
+                    </div>
+                    <div id="pet_charge_type_container" style="display: none;">
+                        <label class="form-label">Pet Charge Type</label>
+                        <select name="pet_charge_type" class="form-input" id="pet_charge_type_select" onchange="togglePetChargeAmountField()">
+                            <option value="free" {{ old('pet_charge_type', $property->pet_charge_type) == 'free' ? 'selected' : '' }}>Free / Non-Chargeable</option>
+                            <option value="chargeable" {{ old('pet_charge_type', $property->pet_charge_type) == 'chargeable' ? 'selected' : '' }}>Chargeable</option>
+                        </select>
+                    </div>
+                    <div id="pet_charge_container" style="display: none;">
+                        <label class="form-label">Pet Charge Amount</label>
+                        <input type="number" name="pet_charge" id="pet_charge_input" value="{{ old('pet_charge', $property->pet_charge) }}" class="form-input" min="0" step="0.01">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INSTAGRAM VIDEOS -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            Instagram Videos <span class="help-text">(Thumbnail + Video Link)</span>
+        </h3>
+        <div id="insta-links-container">
+            @php $instaVideos = is_array($property->instagram_videos) ? $property->instagram_videos : []; @endphp
+            @foreach($instaVideos as $index => $video)
+                @php
+                    $isOldFormat = !is_array($video);
+                    $videoLink = $isOldFormat ? $video : ($video['video_link'] ?? '');
+                    $videoImage = $isOldFormat ? null : ($video['image'] ?? null);
+                @endphp
+                <div class="dynamic-card">
+                    <button type="button" class="btn-remove-dynamic" onclick="this.parentElement.remove()">✕</button>
+                    <div style="display:grid; grid-template-columns:140px 1fr; gap:1.5rem;">
+                        <div>
+                            @if($videoImage)
+                                <img src="{{ Storage::url($videoImage) }}" style="width:100%; height:80px; object-fit:cover; border-radius:var(--radius-sm); margin-bottom:0.5rem;">
+                            @endif
+                            <input type="hidden" name="existing_instagram_video_images[{{ $index }}]" value="{{ $videoImage ?? '' }}">
+                            <input type="file" name="instagram_video_images[{{ $index }}]" class="form-input" style="font-size:0.7rem; padding:0.25rem;" accept="image/*">
+                        </div>
+                        <div style="display:grid; align-content:center; gap:0.5rem;">
+                            <label class="form-label" style="font-size:0.75rem;">Video URL <span class="required-star">*</span></label>
+                            <input type="url" name="instagram_video_links[{{ $index }}]" value="{{ $videoLink }}" class="form-input" placeholder="https://www.instagram.com/reels/XXXXX/">
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        <button type="button" class="btn-add-primary" onclick="addInstaLink()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add Instagram Video
+        </button>
+    </div>
+
+    <!-- NEARBY ATTRACTIONS -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Nearby Attractions
+        </h3>
+        <div id="attractions-container">
+            @php $attractions = is_array($property->nearby_attractions) ? $property->nearby_attractions : []; @endphp
+            @foreach($attractions as $index => $attr)
+                <div class="dynamic-card">
+                    <button type="button" class="btn-remove-dynamic" onclick="this.parentElement.remove()">✕</button>
+                    <div style="display:grid; grid-template-columns:140px 1fr; gap:1.5rem;">
+                        <div>
+                            @if(isset($attr['image']) && $attr['image'])
+                                <img src="{{ Storage::url($attr['image']) }}" style="width:100%; height:100px; object-fit:cover; border-radius:var(--radius-sm); margin-bottom:0.5rem;">
+                            @endif
+                            <input type="hidden" name="existing_attraction_images[]" value="{{ $attr['image'] ?? '' }}">
+                            <input type="file" name="attraction_images[]" class="form-input" style="font-size:0.7rem; padding:0.25rem;">
+                        </div>
+                        <div style="display:grid; gap:0.75rem;">
+                            <input type="text" name="attraction_headings[]" value="{{ $attr['heading'] ?? '' }}" class="form-input" placeholder="Heading (e.g. Table Land)">
+                            <input type="text" name="attraction_alts[]" value="{{ $attr['alt_text'] ?? '' }}" class="form-input" placeholder="Image Alt Text">
+                            <textarea name="attraction_descriptions[]" rows="2" class="form-input" placeholder="Description">{{ $attr['description'] ?? '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        <button type="button" class="btn-add" onclick="addAttraction()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add Attraction
+        </button>
+    </div>
+
+    <!-- THINGS TO DO -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+            Things To Do
+        </h3>
+        <div id="things-to-do-container">
+            @php $tIdx = 0; @endphp
+            @if(is_array($property->things_to_do))
+                @foreach($property->things_to_do as $t)
+                    <div class="dynamic-card" style="padding-right: 3.5rem;">
+                        <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+                        <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+                            <div>
+                                <label class="form-label">Title <span class="required-star">*</span></label>
+                                <input type="text" name="things_to_do[{{$tIdx}}][title]" value="{{ $t['title'] ?? '' }}" class="form-input" placeholder="e.g. Hiking" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Description</label>
+                                <textarea name="things_to_do[{{$tIdx}}][description]" rows="2" class="form-input" placeholder="Details...">{{ $t['description'] ?? '' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                    @php $tIdx++; @endphp
+                @endforeach
+            @endif
+        </div>
+        <button type="button" class="btn-add" onclick="addThingToDo()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add Thing To Do
+        </button>
+    </div>
+
+    <!-- AMENITIES -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.143-7.714L1 12l6.857-2.143L11 3z"></path></svg>
+            Included Amenities
+        </h3>
+        <div class="amenity-grid">
+            @php $pAmenities = $property->amenities->pluck('id')->toArray(); @endphp
+            @foreach($amenities as $amenity)
+                <label class="amenity-item">
+                    <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}" {{ in_array($amenity->id, old('amenities', $pAmenities)) ? 'checked' : '' }}>
+                    @if($amenity->icon)
+                        <img src="{{ Storage::url($amenity->icon) }}" style="width:18px; height:18px; object-fit:contain;">
+                    @endif
+                    {{ $amenity->name }}
+                </label>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- COLLECTIONS -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            Property Collections
+        </h3>
+        <div class="amenity-grid">
+            @php $pCollections = $property->collections->pluck('id')->toArray(); @endphp
+            @foreach($collections as $collection)
+                <label class="amenity-item">
+                    <input type="checkbox" name="collections[]" value="{{ $collection->id }}" {{ in_array($collection->id, old('collections', $pCollections)) ? 'checked' : '' }}>
+                    {{ $collection->heading }}
+                </label>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- MEAL PLANS -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 7h13M7 13l-1.5-7"></path><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+            Meal Plans Included
+        </h3>
+        @php
+            $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'];
+            $selectedMeals = old('meals', $property->meals ?? []);
+        @endphp
+        <div class="amenity-grid">
+            @foreach($mealOptions as $meal)
+                <label class="amenity-item">
+                    <input type="checkbox" name="meals[]" value="{{ $meal }}" {{ in_array($meal, $selectedMeals) ? 'checked' : '' }}>
+                    {{ $meal }}
+                </label>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- CANCELLATION RULES -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Cancellation Rules
+        </h3>
+        <p style="color:#64748b; font-size:0.875rem; margin-bottom:1.5rem;">Define how much to deduct if the user cancels before check-in.</p>
+        <div id="cancellation-rules-container">
+            @php $cancellationRules = $property->cancellationRules ?? collect(); @endphp
+            @foreach($cancellationRules as $index => $rule)
+                <div class="cancellation-rule">
+                    <div class="rule-field">
+                        <label class="form-label">Days Before Check-in</label>
+                        <input type="number" name="cancellation_rules[{{ $index }}][days_before]" value="{{ $rule->days_before }}" class="form-input" min="0" placeholder="e.g. 5">
+                    </div>
+                    <div class="rule-field">
+                        <label class="form-label">Deduction Percentage (%)</label>
+                        <input type="number" name="cancellation_rules[{{ $index }}][deduction_percentage]" value="{{ $rule->deduction_percentage }}" class="form-input" min="0" max="100" step="0.01" placeholder="e.g. 20">
+                    </div>
+                    <button type="button" class="btn-remove-rule" onclick="this.parentElement.remove()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            @endforeach
+        </div>
+        <button type="button" class="btn-add" onclick="addCancellationRule()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add Cancellation Rule
+        </button>
+    </div>
+
+    <!-- SPECIAL DATES (Weekend / Holiday Pricing) -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Special Date Pricing
+        </h3>
+        <p style="color:#64748b; font-size:0.875rem; margin-bottom:1.5rem;">Weekend ya holiday par alag price set karo. Yeh price API mein <code>special_dates</code> field mein ayega.</p>
+
+        <div id="special-dates-container">
+            @php $specialDates = $property->specialDates ?? collect(); @endphp
+            @foreach($specialDates as $index => $sd)
+                <div class="special-date-row">
+                    <div>
+                        <label class="form-label" style="font-size:0.78rem;">Date <span class="required-star">*</span></label>
+                        <input type="date" name="special_dates[{{ $index }}][date]" value="{{ $sd->date->format('Y-m-d') }}" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size:0.78rem;">Amount (₹) <span class="required-star">*</span></label>
+                        <input type="number" name="special_dates[{{ $index }}][amount]" value="{{ $sd->amount }}" class="form-input" min="0" step="0.01" placeholder="e.g. 15000">
+                    </div>
+                    <div>
+                        <label class="form-label" style="font-size:0.78rem;">Label</label>
+                        <input type="text" name="special_dates[{{ $index }}][label]" value="{{ $sd->label }}" class="form-input" placeholder="e.g. Weekend, Diwali">
+                    </div>
+                    <button type="button" class="btn-remove-sd" onclick="this.closest('.special-date-row').remove()" title="Remove">
+                        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            @endforeach
+        </div>
+
+        <button type="button" class="btn-add" onclick="addSpecialDate()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add Special Date
+        </button>
+    </div>
+
+    <!-- IMAGES -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            Property Gallery
+        </h3>
+        
+        <div class="form-group">
+            <label class="form-label">Existing Images & Descriptions</label>
+            <div class="gallery-grid">
+                @foreach($property->gallery ?? [] as $index => $item)
+                    @php 
+                        $imgPath = is_array($item) ? ($item['image'] ?? '') : $item;
+                        $imgAlt = is_array($item) ? ($item['alt'] ?? '') : '';
+                        $displayUrl = (strpos($imgPath, 'http') === 0) ? $imgPath : Storage::url($imgPath);
+                    @endphp
+                    <div class="gallery-card" id="img-card-{{ $index }}">
+                        <img src="{{ $displayUrl }}" alt="{{ $imgAlt }}">
+                        <div class="card-body">
+                            <label>Alt Text</label>
+                            <input type="text" name="existing_alts[{{ $index }}]" value="{{ $imgAlt }}" placeholder="Image description">
+                        </div>
+                        <button type="button" class="btn-remove-image" onclick="deletePropertyImage('{{ $imgPath }}', {{ $index }})">✕</button>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="form-group" style="margin-top: 3rem;">
+            <label class="form-label">Add More Images</label>
+            <div class="drop-zone">
+                <input type="file" name="images[]" multiple accept="image/*" id="images-input" style="display: none;">
+                <label for="images-input" class="upload-label">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Select New Photos
+                </label>
+                <p class="hint-text">Upload HD quality images for better conversion</p>
+                <div id="image-preview-container" class="preview-grid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{{ route('admin.properties.index') }}" class="btn-cancel">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+            Cancel
+        </a>
+        <button type="submit" class="btn-submit">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+            Update Property
+        </button>
+    </div>
+</form>
+
+<!-- ROOMS & UNITS — outside main form to prevent nested form conflict -->
+<div class="form-section" style="margin-top:0;">
+    <h3 class="section-title" style="justify-content: space-between;">
+        <span style="display:flex;align-items:center;gap:0.5rem;">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Rooms &amp; Units
+            <span class="badge-count">{{ $property->rooms()->count() }} Rooms</span>
+        </span>
+        <a href="{{ route('admin.properties.rooms.create', $property) }}" class="btn-add-primary" style="font-size:0.8rem; padding:0.45rem 1.1rem;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add New Room
+        </a>
+    </h3>
+
+    @php $rooms = $property->rooms()->latest()->get(); @endphp
+
+    @if($rooms->isEmpty())
+        <div class="empty-state">
+            <svg width="48" height="48" fill="none" stroke="#cbd5e1" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <p class="title">No rooms yet</p>
+            <p class="subtitle">Click <strong>Add New Room</strong> above to add rooms for this property.</p>
+        </div>
+    @else
+        <div class="room-grid">
+            @foreach($rooms as $room)
+                @php
+                    $firstImage = collect($room->images ?? [])
+                        ->map(fn($img) => is_array($img) ? $img : ['path' => $img, 'alt' => ''])
+                        ->first();
+                @endphp
+                <div class="room-card-item">
+                    @if($firstImage && $firstImage['path'])
+                        <img src="{{ Storage::url($firstImage['path']) }}" alt="{{ $firstImage['alt'] }}" class="room-image">
+                    @else
+                        <div class="room-placeholder">
+                            <svg width="40" height="40" fill="none" stroke="#a5b4fc" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        </div>
+                    @endif
+                    <div class="room-body">
+                        <div class="room-title">{{ $room->title }}</div>
+                        @if($room->bed_type)
+                            <div class="room-bed">🛏 {{ $room->bed_type }}</div>
+                        @endif
+                        <div class="room-meta">
+                            {{ count($room->images ?? []) }} image(s)
+                            &nbsp;•&nbsp;
+                            <span class="room-status {{ $room->is_active ? 'active' : 'inactive' }}">
+                                {{ $room->is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                        <div class="room-actions">
+                            <a href="{{ route('admin.rooms.edit', $room) }}" class="btn-edit">Edit</a>
+                            <form action="{{ route('admin.rooms.destroy', $room) }}" method="POST" onsubmit="return confirm('Delete this room?')" style="flex:1;">
+                                @csrf @method('DELETE')
+                                <button type="submit" class="btn-delete">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+</div>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 <script>
     CKEDITOR.replace('property-description-editor', {
         height: 260,
+        removeButtons: 'About',
+        allowedContent: true
+    });
+    CKEDITOR.replace('property-house-rules-editor', {
+        height: 200,
+        removeButtons: 'About',
+        allowedContent: true
+    });
+    CKEDITOR.replace('property-house-rules-desc-editor', {
+        height: 200,
         removeButtons: 'About',
         allowedContent: true
     });
@@ -865,7 +1444,7 @@
         } catch (error) { alert('Failed to delete image'); }
     }
 
-    let instaIdx = {{ isset($instaVideos) && is_countable($instaVideos) ? count($instaVideos) : 0 }};
+    let instaIdx = {{ count($instaVideos) }};
     function addInstaLink() {
         const container = document.getElementById('insta-links-container');
         const card = document.createElement('div');
@@ -908,6 +1487,28 @@
         container.appendChild(card);
     }
 
+    function addThingToDo() {
+        const container = document.getElementById('things-to-do-container');
+        const card = document.createElement('div');
+        const idx = Date.now();
+        card.className = 'dynamic-card';
+        card.style.paddingRight = '3.5rem';
+        card.innerHTML = `
+            <button type="button" class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+                <div>
+                    <label class="form-label">Title <span class="required-star">*</span></label>
+                    <input type="text" name="things_to_do[${idx}][title]" class="form-input" placeholder="e.g. Hiking" required>
+                </div>
+                <div>
+                    <label class="form-label">Description</label>
+                    <textarea name="things_to_do[${idx}][description]" rows="2" class="form-input" placeholder="Details..."></textarea>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+    }
+
     let cancelIdx = {{ isset($cancellationRules) ? count($cancellationRules) : 0 }};
     function addCancellationRule() {
         const container = document.getElementById('cancellation-rules-container');
@@ -944,16 +1545,8 @@
                 <label class="form-label" style="font-size:0.78rem;">Amount (₹) <span class="required-star">*</span></label>
                 <input type="number" name="special_dates[${sdIdx}][amount]" class="form-input" min="0" step="0.01" placeholder="e.g. 15000">
             </div>
-            
-                    <div>
-                        <label class="form-label" style="font-size:0.78rem;">Status</label>
-                        <select name="special_dates[${sdIdx}][is_open]" class="form-input">
-                            <option value="1" ${isOpen == '1' ? 'selected' : ''}>Open</option>
-                            <option value="0" ${isOpen == '0' ? 'selected' : ''}>Closed</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="form-label" style="font-size:0.78rem;">Label</label>
+            <div>
+                <label class="form-label" style="font-size:0.78rem;">Label</label>
                 <input type="text" name="special_dates[${sdIdx}][label]" class="form-input" placeholder="e.g. Weekend, Diwali">
             </div>
             <button type="button" class="btn-remove-sd" onclick="this.closest('.special-date-row').remove()" title="Remove">
@@ -994,76 +1587,5 @@
             togglePetChargeFields();
         }
     });
-</script>
-
-
-
-
-<script>
-    function openInternalBulkModal() {
-        if (typeof renderRealCalendar === 'function') {
-            renderRealCalendar();
-        }
-        document.getElementById('mainFormView').style.display = 'none';
-        document.getElementById('calendarView').style.display = 'block';
-    }
-    function closeInternalBulkModal() {
-        document.getElementById('calendarView').style.display = 'none';
-        document.getElementById('mainFormView').style.display = 'block';
-    }
-    function generateSpecialDates() {
-        const fromDate = document.getElementById('ib_from').value;
-        const toDate = document.getElementById('ib_to').value;
-        const amount = document.getElementById('ib_amount').value;
-        const isOpen = document.querySelector('input[name="ib_is_open"]:checked').value;
-        
-        if(!fromDate || !toDate) {
-            alert('Please fill from date and to date.');
-            return;
-        }
-
-        const start = new Date(fromDate);
-        const end = new Date(toDate);
-        if(start > end) {
-            alert('From date must be before or equal to To date.');
-            return;
-        }
-
-        const daysChecked = Array.from(document.querySelectorAll('.ib_days:checked')).map(cb => parseInt(cb.value));
-        if(daysChecked.length === 0) {
-            alert('Please select at least one day.');
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('_token', '{{ csrf_token() }}');
-        formData.append('property_ids[]', '{{ $property->id }}');
-        formData.append('from_date', fromDate);
-        formData.append('to_date', toDate);
-        formData.append('amount', amount);
-        formData.append('is_open', isOpen);
-        
-        daysChecked.forEach(d => formData.append('days[]', d));
-
-        fetch('{{ route("admin.properties.bulk_special_dates") }}', {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success) {
-                window.location.reload();
-            } else {
-                alert(data.message || 'An error occurred.');
-            }
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Request failed.');
-        });
-    }
 </script>
 @endsection

@@ -94,6 +94,14 @@
                     <label class="form-label">Description</label>
                     <textarea name="description" rows="5" class="form-input" placeholder="Tell us about your beautiful property...">{{ old('description') }}</textarea>
                 </div>
+                <div class="form-group full-width">
+                    <label class="form-label">House Rules</label>
+                    <textarea name="house_rules" rows="5" class="form-input" placeholder="Enter house rules...">{{ old('house_rules') }}</textarea>
+                </div>
+                <div class="form-group full-width">
+                    <label class="form-label">House Rules Description</label>
+                    <textarea name="house_rules_description" rows="5" class="form-input" placeholder="Enter house rules description...">{{ old('house_rules_description') }}</textarea>
+                </div>
             </div>
         </div>
 
@@ -242,6 +250,16 @@
             </button>
         </div>
 
+        <!-- THINGS TO DO -->
+        <div class="form-section">
+            <h3 class="section-title">Things To Do</h3>
+            <div id="things-to-do-container"></div>
+            <button type="button" onclick="addThingToDo()" class="btn-add" style="background:var(--bg-body); color:var(--text-main); border:2px dashed var(--border); box-shadow:none;">
+                + Add Thing To Do
+            </button>
+        </div>
+        </div>
+
         <!-- ROOMS -->
         <div class="form-section">
             <h3 class="section-title">Rooms & Units Builder</h3>
@@ -353,6 +371,22 @@
         `;
         document.getElementById('attractions-container').appendChild(div);
         aIdx++;
+    }
+
+    let tIdx = 0;
+    function addThingToDo() {
+        const div = document.createElement('div');
+        div.className = 'dynamic-card';
+        div.style.position = 'relative';
+        div.innerHTML = `
+            <button type="button" class="btn-remove" onclick="this.parentElement.remove()" style="position:absolute; top:1rem; right:1rem; width:24px; height:24px; border-radius:50%; background:#ef4444; color:#fff; border:none; display:flex; align-items:center; justify-content:center; cursor:pointer;">&times;</button>
+            <div style="display:grid; grid-template-columns:1fr; gap:1rem;">
+                <div class="form-group full-width"><label class="form-label">Title <span class="required-star">*</span></label><input type="text" name="things_to_do[${tIdx}][title]" class="form-input" placeholder="Title" required></div>
+                <div class="form-group full-width"><label class="form-label">Description</label><textarea name="things_to_do[${tIdx}][description]" class="form-input" rows="2" placeholder="Description"></textarea></div>
+            </div>
+        `;
+        document.getElementById('things-to-do-container').appendChild(div);
+        tIdx++;
     }
 
     let rIdx = 0;

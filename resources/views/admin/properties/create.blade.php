@@ -706,12 +706,402 @@
 @endsection
 
 @section('content')
+@if ($errors->any())
+    <div class="error-alert">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
 
+<form action="{{ route('admin.properties.store') }}" method="POST" enctype="multipart/form-data" id="property-form">
+    @csrf
 
+    <!-- BASIC INFORMATION -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Basic Information
+        </h3>
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label class="form-label">Property Name <span class="required-star">*</span></label>
+                <div style="display: flex; gap: 1rem;">
+                    <input type="text" name="name" value="{{ old('name') }}" required class="form-input" placeholder="e.g. Hilltop Villa & Suites" style="flex: 2;">
+                </div>
+                @error('name') <p class="form-error">{{ $message }}</p> @enderror
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Category <span class="required-star">*</span></label>
+                <select name="category_id" required class="form-input">
+                    <option value="">Select Category</option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ old('category_id') == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                    @endforeach
+                </select>
+            </div>
 
+            <div class="form-group">
+                <label class="form-label">Destination <span class="required-star">*</span></label>
+                <select name="destination_id" required class="form-input">
+                    <option value="">Select Destination</option>
+                    @foreach($destinations as $destination)
+                        <option value="{{ $destination->id }}" {{ old('destination_id') == $destination->id ? 'selected' : '' }}>{{ $destination->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Assign to Vendor <span class="required-star">*</span></label>
+                <select name="vendor_id" required class="form-input">
+                    <option value="">Select Vendor</option>
+                    @foreach($vendors as $vendor)
+                        <option value="{{ $vendor->id }}" {{ old('vendor_id') == $vendor->id ? 'selected' : '' }}>{{ $vendor->user->name }} ({{ $vendor->user->email }})</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="form-group full-width">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:1.5rem;">
+                    <div>
+                        <label class="form-label">Total Bedrooms <span class="required-star">*</span></label>
+                        <input type="number" name="total_bedrooms" value="{{ old('total_bedrooms', 0) }}" required class="form-input" min="0">
+                    </div>
+                    <div>
+                        <label class="form-label">Total Bathrooms <span class="required-star">*</span></label>
+                        <input type="number" name="total_bathrooms" value="{{ old('total_bathrooms', 0) }}" required class="form-input" min="0">
+                    </div>
+                    <div>
+                        <label class="form-label">Max Guests <span class="required-star">*</span></label>
+                        <input type="number" name="max_guests" value="{{ old('max_guests', 0) }}" required class="form-input" min="0">
+                    </div>
+                    <div>
+                        <label class="form-label">Max Capacity</label>
+                        <input type="number" name="max_capacity" value="{{ old('max_capacity') }}" class="form-input" min="0" placeholder="Guests + Staff">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group full-width">
+                <label class="form-label">Description</label>
+                <textarea name="description" id="property-description-editor" rows="4" class="form-input" placeholder="Tell us about the property...">{{ old('description') }}</textarea>
+            </div>
+            <div class="form-group full-width">
+                <label class="form-label">House Rules</label>
+                <textarea name="house_rules" id="property-house-rules-editor" rows="4" class="form-input" placeholder="Enter house rules...">{{ old('house_rules') }}</textarea>
+            </div>
+            <div class="form-group full-width">
+                <label class="form-label">House Rules Description</label>
+                <textarea name="house_rules_description" id="property-house-rules-desc-editor" rows="4" class="form-input" placeholder="Enter house rules description...">{{ old('house_rules_description') }}</textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOCATION DETAILS -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Location Details
+        </h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label class="form-label">City <span class="required-star">*</span></label>
+                <input type="text" name="city" value="{{ old('city') }}" required class="form-input" placeholder="e.g. Panchgani">
+            </div>
+            <div class="form-group">
+                <label class="form-label">State <span class="required-star">*</span></label>
+                <input type="text" name="state" value="{{ old('state') }}" required class="form-input" placeholder="e.g. Maharashtra">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Country <span class="required-star">*</span></label>
+                <input type="text" name="country" value="{{ old('country', 'India') }}" required class="form-input">
+            </div>
+            <div class="form-group">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div>
+                        <label class="form-label">Latitude</label>
+                        <input type="text" name="latitude" value="{{ old('latitude') }}" class="form-input" placeholder="e.g. 17.92">
+                    </div>
+                    <div>
+                        <label class="form-label">Longitude</label>
+                        <input type="text" name="longitude" value="{{ old('longitude') }}" class="form-input" placeholder="e.g. 73.81">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AMENITIES -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.143-7.714L1 12l6.857-2.143L11 3z"></path></svg>
+            Included Amenities
+        </h3>
+        <div class="amenity-grid">
+            @foreach($amenities as $amenity)
+                <label class="amenity-item">
+                    <input type="checkbox" name="amenities[]" value="{{ $amenity->id }}" {{ is_array(old('amenities')) && in_array($amenity->id, old('amenities')) ? 'checked' : '' }}>
+                    @if($amenity->icon)
+                        <img src="{{ Storage::url($amenity->icon) }}" alt="{{ $amenity->name }}">
+                    @endif
+                    {{ $amenity->name }}
+                </label>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- COLLECTIONS -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+            Property Collections
+        </h3>
+        <div class="amenity-grid">
+            @foreach($collections as $collection)
+                <label class="amenity-item">
+                    <input type="checkbox" name="collections[]" value="{{ $collection->id }}" {{ is_array(old('collections')) && in_array($collection->id, old('collections')) ? 'checked' : '' }}>
+                    {{ $collection->heading }}
+                </label>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- MEAL PLANS -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.5 7h13M7 13l-1.5-7"></path><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
+            Meal Plans Included
+        </h3>
+        @php
+            $mealOptions = ['Breakfast', 'Lunch', 'Dinner', 'All Inclusive', 'Breakfast & Dinner', 'No Meals', 'Veg', 'Non-Veg', 'Jain'];
+            $selectedMeals = old('meals', []);
+        @endphp
+        <div class="amenity-grid">
+            @foreach($mealOptions as $meal)
+                <label class="amenity-item">
+                    <input type="checkbox" name="meals[]" value="{{ $meal }}" {{ in_array($meal, $selectedMeals) ? 'checked' : '' }}>
+                    {{ $meal }}
+                </label>
+            @endforeach
+        </div>
+    </div>
+
+    <!-- CANCELLATION RULES -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            Cancellation Rules
+        </h3>
+        <p style="color:#64748b; font-size:0.875rem; margin-bottom:1.5rem;">Define how much to deduct if the user cancels before check-in.</p>
+        <div id="cancellation-rules-container">
+            <!-- Dynamic rules -->
+        </div>
+        <button type="button" class="btn-add-rule" onclick="addCancellationRule()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add Cancellation Rule
+        </button>
+    </div>
+
+    <!-- SETTINGS & MEDIA -->
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            Operational Info & Gallery
+        </h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div>
+                        <label class="form-label">Check-in After</label>
+                        <input type="time" name="check_in_time" value="{{ old('check_in_time', '14:00') }}" class="form-input">
+                    </div>
+                    <div>
+                        <label class="form-label">Check-out Before</label>
+                        <input type="time" name="check_out_time" value="{{ old('check_out_time', '11:00') }}" class="form-input">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Publishing Status <span class="required-star">*</span></label>
+                <select name="status" required class="form-input">
+                    <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending Approval</option>
+                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active / Live</option>
+                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive / Hidden</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Property Brochure <span class="help-text">(PDF)</span></label>
+                <input type="file" name="brochure" accept="application/pdf" class="form-input" style="padding: 0.5rem;">
+                <p style="color:#94a3b8; font-size:0.7rem; margin-top:0.25rem;">Upload property brochure or details PDF (Max 10MB)</p>
+            </div>
+            <div class="form-group">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div>
+                        <label class="form-label">GST %</label>
+                        <input type="number" name="gst" value="{{ old('gst', 0) }}" class="form-input" min="0" step="0.01">
+                    </div>
+                    <div>
+                        <label class="form-label">Price / Amount</label>
+                        <input type="number" step="0.01" name="amount" value="{{ old('amount') }}" class="form-input" placeholder="Amount">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1.5rem;">
+                    <div>
+                        <label class="form-label">Extra Person Charge</label>
+                        <input type="number" name="extra_person_charge" value="{{ old('extra_person_charge', 0) }}" class="form-input" min="0" step="0.01">
+                    </div>
+                    <div style="display: flex; align-items: flex-end; gap: 2rem; padding-bottom: 0.25rem;">
+                        <label class="checkbox-group">
+                            <input type="checkbox" name="show_on_homepage" value="1" {{ old('show_on_homepage') ? 'checked' : '' }}>
+                            <span>Show on Homepage</span>
+                        </label>
+                        <label class="checkbox-group">
+                            <input type="checkbox" name="show_in_menu" value="1" {{ old('show_in_menu') ? 'checked' : '' }}>
+                            <span>Show in Menu</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group full-width" style="border-top: 1.5px solid #f1f5f9; padding-top: 1.5rem; margin-top: 0.5rem;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1.5rem;">
+                    <div>
+                        <label class="form-label">Pets Allowed</label>
+                        <select name="pets_allowed" class="form-input" id="pets_allowed_select" onchange="togglePetChargeFields()">
+                            <option value="0" {{ old('pets_allowed') == '0' ? 'selected' : '' }}>No</option>
+                            <option value="1" {{ old('pets_allowed') == '1' ? 'selected' : '' }}>Yes</option>
+                        </select>
+                    </div>
+                    <div id="pet_charge_type_container" style="display: none;">
+                        <label class="form-label">Pet Charge Type</label>
+                        <select name="pet_charge_type" class="form-input" id="pet_charge_type_select" onchange="togglePetChargeAmountField()">
+                            <option value="free" {{ old('pet_charge_type') == 'free' ? 'selected' : '' }}>Free / Non-Chargeable</option>
+                            <option value="chargeable" {{ old('pet_charge_type') == 'chargeable' ? 'selected' : '' }}>Chargeable</option>
+                        </select>
+                    </div>
+                    <div id="pet_charge_container" style="display: none;">
+                        <label class="form-label">Pet Charge Amount</label>
+                        <input type="number" name="pet_charge" id="pet_charge_input" value="{{ old('pet_charge', 0) }}" class="form-input" min="0" step="0.01">
+                    </div>
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label class="form-label">Property Gallery <span class="required-star">*</span></label>
+                <div class="gallery-drop-zone">
+                    <input type="file" name="images[]" multiple accept="image/*" required id="gallery-input" style="display: none;">
+                    <label for="gallery-input" class="upload-label">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        Choose Photos
+                    </label>
+                    <p class="hint-text">Upload HD quality images for better conversion</p>
+                    <div id="gallery-preview" class="gallery-preview-grid"></div>
+                </div>
+            </div>
+
+            <!-- INSTAGRAM VIDEOS -->
+            <div class="form-group full-width" style="margin-top: 1.5rem; border-top: 1.5px solid #f1f5f9; padding-top: 2rem;">
+                <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary); font-size: 1rem;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                    Instagram Videos <span class="help-text">(Thumbnail + Video Link)</span>
+                </label>
+                <div id="insta-links-container">
+                    <!-- Dynamic Instagram video blocks -->
+                </div>
+                <button type="button" class="btn-add-insta" onclick="addInstaLink()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                    Add Instagram Video
+                </button>
+            </div>
+
+            <!-- NEARBY ATTRACTIONS -->
+            <div class="form-group full-width" style="margin-top: 1.5rem; border-top: 1.5px solid #f1f5f9; padding-top: 2rem;">
+                <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary); font-size: 1rem;">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Nearby Attractions
+                </label>
+                <div id="attractions-container">
+                    <!-- Dynamic attractions will be added here -->
+                </div>
+                <button type="button" class="btn-add-attraction" onclick="addAttraction()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                    Add Attraction
+                </button>
+            </div>
+            
+            <div class="form-group full-width" style="margin-top: 1.5rem; border-top: 1.5px solid #f1f5f9; padding-top: 2rem;">
+                <label class="form-label" style="display: flex; align-items: center; gap: 0.5rem; color: var(--primary); font-size: 1rem;">
+                    <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"></path></svg>
+                    Things To Do
+                </label>
+                <div id="things-to-do-container">
+                    <!-- Dynamic things to do will be added here -->
+                </div>
+                <button type="button" class="btn-add-attraction" onclick="addThingToDo()">
+                    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                    Add Thing To Do
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {{-- ═══════════════════════════════════════════════════════════════ --}}
+    {{-- ROOMS & UNITS BUILDER --}}
+    {{-- ═══════════════════════════════════════════════════════════════ --}}
+    <div class="form-section">
+        <h3 class="section-title">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            Rooms &amp; Units
+            <span class="badge-count" id="room-count-badge">0 Rooms</span>
+        </h3>
+
+        <div id="empty-rooms-placeholder" class="empty-rooms">
+            <svg width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 0.75rem; color:#cbd5e1;"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+            <p style="font-weight:600; color:#1e293b; margin-bottom:0.25rem;">No rooms added yet</p>
+            <p style="color:#94a3b8;">Click <strong>Add Room</strong> below to add rooms with images, bed type &amp; meal plans.</p>
+        </div>
+
+        <div id="rooms-container"></div>
+
+        <div style="margin-top:1.5rem;">
+            <button type="button" class="btn-add-room" onclick="addRoom()">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+                Add Room
+            </button>
+        </div>
+    </div>
+
+    <div class="action-buttons">
+        <a href="{{ route('admin.properties.index') }}" class="btn-cancel">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
+            Cancel
+        </a>
+        <button type="submit" class="btn-submit">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"></path></svg>
+            Add Property Now
+        </button>
+    </div>
+</form>
+@endsection
+
+@section('scripts')
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
 <script>
     CKEDITOR.replace('property-description-editor', {
         height: 260,
+        removeButtons: 'About',
+        allowedContent: true
+    });
+    CKEDITOR.replace('property-house-rules-editor', {
+        height: 200,
+        removeButtons: 'About',
+        allowedContent: true
+    });
+    CKEDITOR.replace('property-house-rules-desc-editor', {
+        height: 200,
         removeButtons: 'About',
         allowedContent: true
     });
@@ -900,6 +1290,29 @@
         attractionIdx++;
     }
 
+    let thingToDoIdx = 0;
+    function addThingToDo() {
+        const container = document.getElementById('things-to-do-container');
+        const card = document.createElement('div');
+        card.className = 'dynamic-card';
+        card.style.paddingRight = '3.5rem';
+        card.innerHTML = `
+            <button type="button" class="btn-remove-dynamic" onclick="this.parentElement.remove()">✕</button>
+            <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
+                <div>
+                    <label class="form-label">Title <span class="required-star">*</span></label>
+                    <input type="text" name="things_to_do[${thingToDoIdx}][title]" class="form-input" placeholder="e.g. Hiking" required>
+                </div>
+                <div>
+                    <label class="form-label">Description</label>
+                    <textarea name="things_to_do[${thingToDoIdx}][description]" rows="2" class="form-input" placeholder="Details..."></textarea>
+                </div>
+            </div>
+        `;
+        container.appendChild(card);
+        thingToDoIdx++;
+    }
+
     function togglePetChargeFields() {
         const petsAllowed = document.getElementById('pets_allowed_select').value;
         const typeContainer = document.getElementById('pet_charge_type_container');
@@ -931,98 +1344,5 @@
             togglePetChargeFields();
         }
     });
-</script>
-
-
-
-
-<script>
-    function openInternalBulkModal() {
-        if (typeof renderRealCalendar === 'function') {
-            renderRealCalendar();
-        }
-        document.getElementById('mainFormView').style.display = 'none';
-        document.getElementById('calendarView').style.display = 'block';
-    }
-    function closeInternalBulkModal() {
-        document.getElementById('calendarView').style.display = 'none';
-        document.getElementById('mainFormView').style.display = 'block';
-    }
-    function generateSpecialDates() {
-        const fromDate = document.getElementById('ib_from').value;
-        const toDate = document.getElementById('ib_to').value;
-        const amount = document.getElementById('ib_amount').value;
-        const isOpen = document.querySelector('input[name="ib_is_open"]:checked').value;
-        const label = document.getElementById('ib_label').value;
-        
-        if(!fromDate || !toDate) {
-            alert('Please fill from date and to date.');
-            return;
-        }
-
-        const start = new Date(fromDate);
-        const end = new Date(toDate);
-        if(start > end) {
-            alert('From date must be before or equal to To date.');
-            return;
-        }
-
-        const daysChecked = Array.from(document.querySelectorAll('.ib_days:checked')).map(cb => parseInt(cb.value));
-        if(daysChecked.length === 0) {
-            alert('Please select at least one day.');
-            return;
-        }
-
-        let addedCount = 0;
-        const container = document.getElementById('special-dates-container');
-
-        let currentDate = new Date(start);
-        while(currentDate <= end) {
-            if(daysChecked.includes(currentDate.getDay())) {
-                const year = currentDate.getFullYear();
-                const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-                const day = String(currentDate.getDate()).padStart(2, '0');
-                const dateStr = `${year}-${month}-${day}`;
-                
-                const row = document.createElement('div');
-                row.className = 'special-date-row';
-                row.innerHTML = `
-            <div>
-                <label class="form-label" style="font-size:0.78rem;">Date <span class="required-star">*</span></label>
-                <input type="date" name="special_dates[${sdIdx}][date]" ${typeof dateStr !== 'undefined' ? 'value="' + dateStr + '"' : ''} class="form-input">
-            </div>
-            <div>
-                <label class="form-label" style="font-size:0.78rem;">Amount (₹) <span class="required-star">*</span></label>
-                <input type="number" name="special_dates[${sdIdx}][amount]" ${typeof amount !== 'undefined' ? 'value="' + amount + '"' : ''} class="form-input" min="0" step="0.01" placeholder="e.g. 15000">
-            </div>
-            <div>
-                <label class="form-label" style="font-size:0.78rem;">Status</label>
-                <select name="special_dates[${sdIdx}][is_open]" class="form-input">
-                    <option value="1" ${typeof isOpen !== 'undefined' && isOpen == '1' ? 'selected' : ''}>Open</option>
-                    <option value="0" ${typeof isOpen !== 'undefined' && isOpen == '0' ? 'selected' : ''}>Closed</option>
-                </select>
-            </div>
-            <div>
-                <label class="form-label" style="font-size:0.78rem;">Label</label>
-                <input type="text" name="special_dates[${sdIdx}][label]" ${typeof label !== 'undefined' ? 'value="' + label + '"' : ''} class="form-input" placeholder="e.g. Weekend, Diwali">
-            </div>
-            <button type="button" class="btn-remove-sd" onclick="this.closest('.special-date-row').remove()" title="Remove">
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-        `;
-                container.appendChild(row);
-                sdIdx++;
-                addedCount++;
-            }
-            currentDate.setDate(currentDate.getDate() + 1);
-        }
-
-        closeInternalBulkModal();
-        if(addedCount > 0) {
-            alert(`Successfully generated ${addedCount} special dates.`);
-        } else {
-            alert('No dates matched the selected days in the given range.');
-        }
-    }
 </script>
 @endsection

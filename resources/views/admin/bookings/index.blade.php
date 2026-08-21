@@ -682,6 +682,11 @@
                     <label>Amount (₹)</label>
                     <input type="number" id="specialPriceInput" class="form-control-select" placeholder="e.g. 35000">
                 </div>
+                
+                <button type="button" id="saveSpecialPriceBtn" style="width: 100%; padding: 0.75rem; background: var(--primary); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+                    Save Price
+                </button>
+            </div>
         </div>
     </div>
 </div>

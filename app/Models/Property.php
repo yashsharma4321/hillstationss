@@ -15,7 +15,7 @@ class Property extends Model
         'city', 'state', 'zip_code', 'country', 'latitude', 'longitude', 
         'check_in_time', 'check_out_time', 'status', 'average_rating', 'show_on_homepage', 
         'is_featured', 'show_in_menu', 'gst', 'extra_person_charge', 'instagram_videos', 'nearby_attractions', 'brochure', 'meals',
-        'pets_allowed', 'pet_charge_type', 'pet_charge'
+        'pets_allowed', 'pet_charge_type', 'pet_charge', 'house_rules', 'house_rules_description', 'things_to_do'
     ];
 
     protected $casts = [
@@ -23,6 +23,7 @@ class Property extends Model
         'instagram_videos' => 'array',
         'nearby_attractions' => 'array',
         'meals' => 'array',
+        'things_to_do' => 'array',
         'show_in_menu' => 'boolean',
         'show_on_homepage' => 'boolean',
         'is_featured' => 'boolean',

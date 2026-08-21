@@ -79,6 +79,9 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
 
     Route::post('properties/bulk-special-dates', [\App\Http\Controllers\Admin\PropertyController::class, 'bulkAddSpecialDates'])->name('admin.properties.bulk_special_dates');
+    Route::post('properties/{property}/ajax-special-dates', [\App\Http\Controllers\Admin\PropertyController::class, 'ajaxAddSpecialDates'])->name('admin.properties.ajax_special_dates');
+    Route::get('properties/{property}/calendar', [\App\Http\Controllers\Admin\PropertyController::class, 'calendar'])->name('admin.properties.calendar');
+    Route::get('properties/{property}/calendar-events', [\App\Http\Controllers\Admin\PropertyController::class, 'getCalendarEvents'])->name('admin.properties.calendar_events');
     Route::delete('properties/image/{property}', [\App\Http\Controllers\Admin\PropertyController::class, 'deleteImage'])->name('admin.properties.image.delete');
     
     // Room Management
@@ -106,6 +109,9 @@ Route::middleware(['vendor'])->prefix('vendor')->group(function () {
     Route::post('/properties', [VendorProperty::class, 'store'])->name('vendor.properties.store');
     Route::get('/properties/{property}/edit', [VendorProperty::class, 'edit'])->name('vendor.properties.edit');
     Route::put('/properties/{property}', [VendorProperty::class, 'update'])->name('vendor.properties.update');
+    Route::post('/properties/{property}/ajax-special-dates', [VendorProperty::class, 'ajaxAddSpecialDates'])->name('vendor.properties.ajax_special_dates');
+    Route::get('/properties/{property}/calendar', [VendorProperty::class, 'calendar'])->name('vendor.properties.calendar');
+    Route::get('/properties/{property}/calendar-events', [VendorProperty::class, 'getCalendarEvents'])->name('vendor.properties.calendar_events');
     Route::delete('/properties/image/{property}', [VendorProperty::class, 'deleteImage'])->name('vendor.properties.image.delete');
     
     // Vendor Coupons

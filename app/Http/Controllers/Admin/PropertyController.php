@@ -399,4 +399,123 @@ class PropertyController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Special dates added successfully.']);
     }
+
+    public function ajaxAddSpecialDates(\Illuminate\Http\Request $request, Property $property)
+    {
+        $request->validate([
+            'from_date' => 'required|date',
+            'to_date' => 'required|date|after_or_equal:from_date',
+            'amount' => 'required|numeric|min:0',
+            'label' => 'nullable|string|max:255',
+            'is_open' => 'nullable|boolean'
+        ]);
+
+        $fromDate = \Carbon\Carbon::parse($request->from_date);
+        $toDate = \Carbon\Carbon::parse($request->to_date);
+        $amount = $request->amount;
+        $label = $request->label;
+        $isOpen = $request->has('is_open') ? $request->is_open : 1;
+        $days = $request->input('days', []); // Array of day numbers (0 for Sunday, 6 for Saturday)
+
+        $addedDates = [];
+
+        for ($date = $fromDate; $date->lte($toDate); $date->addDay()) {
+            // If days array is provided, only process if the day of week is in the array
+            if (!empty($days) && !in_array($date->dayOfWeek, $days)) {
+                continue;
+            }
+
+            $dateStr = $date->format('Y-m-d');
+            $sd = $property->specialDates()->updateOrCreate(
+                ['date' => $dateStr],
+                ['amount' => $amount, 'is_open' => $isOpen, 'label' => $label]
+            );
+            $addedDates[] = $sd;
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Special dates added successfully.',
+            'dates' => $addedDates
+        ]);
+    }
+
+    public function calendar(Property $property)
+    {
+        return view('admin.properties.calendar', compact('property'));
+    }
+
+    public function getCalendarEvents(\Illuminate\Http\Request $request, Property $property)
+    {
+        $startStr = $request->query('start');
+        $endStr = $request->query('end');
+
+        if (!$startStr || !$endStr) {
+            return response()->json([]);
+        }
+
+        $startDate = \Carbon\Carbon::parse($startStr);
+        $endDate = \Carbon\Carbon::parse($endStr);
+        $basePrice = $property->amount ?? 0;
+
+        $events = [];
+
+        // 1. Base Prices
+        for ($date = $startDate->copy(); $date->lt($endDate); $date->addDay()) {
+            $events[$date->format('Y-m-d')] = [
+                'title' => 'Available ₹' . number_format($basePrice, 0),
+                'start' => $date->format('Y-m-d'),
+                'display' => 'background',
+                'color' => '#f8fafc',
+                'textColor' => '#1e293b',
+                'amount' => $basePrice
+            ];
+        }
+
+        // 2. Special Dates Override
+        $specialDates = $property->specialDates()
+            ->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->get();
+
+        foreach ($specialDates as $sd) {
+            $dateStr = $sd->date->format('Y-m-d');
+            $title = 'Available ₹' . number_format($sd->amount, 0);
+            if (!$sd->is_open) {
+                $title = 'Closed';
+            }
+            if ($sd->label) {
+                $title .= ' (' . $sd->label . ')';
+            }
+
+            $events[$dateStr] = [
+                'title' => $title,
+                'start' => $dateStr,
+                'display' => 'background',
+                'color' => $sd->is_open ? '#e0e7ff' : '#fee2e2',
+                'textColor' => $sd->is_open ? '#4338ca' : '#b91c1c',
+                'amount' => $sd->amount
+            ];
+        }
+
+        // 3. Bookings
+        $bookings = $property->bookings()
+            ->where('status', '!=', 'cancelled')
+            ->where(function ($query) use ($startDate, $endDate) {
+                $query->whereBetween('check_in', [$startDate, $endDate])
+                      ->orWhereBetween('check_out', [$startDate, $endDate]);
+            })->get();
+
+        $bookingEvents = [];
+        foreach ($bookings as $booking) {
+            $bookingEvents[] = [
+                'title' => $booking->customer_name ?? 'Booked',
+                'start' => $booking->check_in,
+                'end' => $booking->check_out, // exclusive in FullCalendar
+                'color' => '#3b82f6',
+                'textColor' => '#ffffff'
+            ];
+        }
+
+        return response()->json(array_merge(array_values($events), $bookingEvents));
+    }
 }

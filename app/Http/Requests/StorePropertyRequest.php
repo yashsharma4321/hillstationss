@@ -61,6 +61,12 @@ class StorePropertyRequest extends FormRequest
             'rooms.*.meals'           => 'nullable|array',
             'room_images.*.*'         => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
             'room_image_alts.*.*'     => 'nullable|string|max:255',
+            'cancellation_rules.*.deduction_percentage' => 'required_with:cancellation_rules.*|numeric|min:0|max:100',
+            'house_rules' => 'nullable|string',
+            'house_rules_description' => 'nullable|string',
+            'things_to_do' => 'nullable|array',
+            'things_to_do.*.title' => 'nullable|string|max:255',
+            'things_to_do.*.description' => 'nullable|string',
         ];
 
         if (Auth::check() && Auth::user()->role === 'vendor') {
