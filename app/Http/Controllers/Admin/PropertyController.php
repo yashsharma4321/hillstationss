@@ -143,10 +143,10 @@ class PropertyController extends Controller
         if ($request->has('special_dates')) {
             $property->specialDates()->delete();
             foreach ($request->input('special_dates', []) as $sd) {
-                if (empty($sd['date']) || empty($sd['amount'])) continue;
+                if (empty($sd['date'])) continue;
                 $property->specialDates()->create([
                     'date'   => $sd['date'],
-                    'amount' => $sd['amount'],
+                    'amount' => $sd['amount'] ?? 0, 'is_open' => $sd['is_open'] ?? 1,
                     'label'  => $sd['label'] ?? null,
                 ]);
             }
@@ -285,10 +285,10 @@ class PropertyController extends Controller
         // Handle Special Dates
         $property->specialDates()->delete();
         foreach ($request->input('special_dates', []) as $sd) {
-            if (empty($sd['date']) || empty($sd['amount'])) continue;
+            if (empty($sd['date'])) continue;
             $property->specialDates()->create([
                 'date'   => $sd['date'],
-                'amount' => $sd['amount'],
+                'amount' => $sd['amount'] ?? 0, 'is_open' => $sd['is_open'] ?? 1,
                 'label'  => $sd['label'] ?? null,
             ]);
         }
@@ -359,5 +359,44 @@ class PropertyController extends Controller
         }
 
         return response()->json(['success' => true]);
+    }
+
+    public function bulkAddSpecialDates(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'property_ids' => 'required|array',
+            'property_ids.*' => 'exists:properties,id',
+            'from_date' => 'required|date',
+            'to_date' => 'required|date|after_or_equal:from_date',
+            'days' => 'required|array',
+            'amount' => 'nullable|numeric',
+            'is_open' => 'required|boolean'
+        ]);
+
+        $properties = \App\Models\Property::whereIn('id', $request->property_ids)->get();
+        $fromDate = \Carbon\Carbon::parse($request->from_date);
+        $toDate = \Carbon\Carbon::parse($request->to_date);
+        $days = $request->days;
+        $amount = $request->amount ?? 0;
+        $isOpen = $request->is_open;
+
+        $datesToAdd = [];
+        for ($date = $fromDate; $date->lte($toDate); $date->addDay()) {
+            // Carbon dayOfWeek returns 0 (Sun) to 6 (Sat)
+            if (in_array($date->dayOfWeek, $days)) {
+                $datesToAdd[] = $date->format('Y-m-d');
+            }
+        }
+
+        foreach ($properties as $property) {
+            foreach ($datesToAdd as $dateStr) {
+                $property->specialDates()->updateOrCreate(
+                    ['date' => $dateStr],
+                    ['amount' => $amount, 'is_open' => $isOpen]
+                );
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Special dates added successfully.']);
     }
 }

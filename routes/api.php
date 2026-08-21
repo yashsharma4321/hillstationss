@@ -112,6 +112,11 @@ Route::get('/properties/{slug}/reviews', [\App\Http\Controllers\Api\ReviewContro
 
 // Booked dates by property ID — returns each date with customer info for hover tooltips
 Route::get('/properties/{id}/booked-dates', function ($id) {
+    $property = \App\Models\Property::with('specialDates')->find($id);
+    if (!$property) {
+        return response()->json(['status' => 'error', 'message' => 'Property not found'], 404);
+    }
+    
     $bookings = \App\Models\Booking::with('customer')
         ->where('property_id', $id)
         ->where('status', '!=', 'cancelled')
@@ -131,6 +136,7 @@ Route::get('/properties/{id}/booked-dates', function ($id) {
             $bookingNumber = $bk->booking_number ?? 'N/A';
 
             $dateMap[$d][] = [
+                'id'             => $bk->id,
                 'name'           => $name,
                 'booking_number' => $bookingNumber,
                 'check_in'       => $checkIn->format('d M Y'),
@@ -140,12 +146,41 @@ Route::get('/properties/{id}/booked-dates', function ($id) {
         }
     }
 
+    $specialPrices = [];
+    if ($property->specialDates) {
+        foreach ($property->specialDates as $sd) {
+            $specialPrices[$sd->date->format('Y-m-d')] = $sd->amount;
+        }
+    }
+
     return response()->json([
-        'status'       => 'success',
-        'booked_dates' => array_keys($dateMap),
-        'date_info'    => $dateMap,
+        'status'         => 'success',
+        'booked_dates'   => array_keys($dateMap),
+        'date_info'      => $dateMap,
+        'default_price'  => $property->amount,
+        'special_prices' => $specialPrices,
     ]);
 });
+
+Route::post('/properties/{id}/special-dates', function (\Illuminate\Http\Request $request, $id) {
+    $request->validate([
+        'date' => 'required|date_format:Y-m-d',
+        'amount' => 'required|numeric|min:0',
+    ]);
+
+    $property = \App\Models\Property::find($id);
+    if (!$property) {
+        return response()->json(['status' => 'error', 'message' => 'Property not found'], 404);
+    }
+
+    \App\Models\PropertySpecialDate::updateOrCreate(
+        ['property_id' => $id, 'date' => $request->date],
+        ['amount' => $request->amount]
+    );
+
+    return response()->json(['status' => 'success', 'message' => 'Special date price updated successfully']);
+});
+
 Route::get('collections', [\App\Http\Controllers\Api\CollectionController::class, 'index']);
 Route::get('vendor-registration/setup', [\App\Http\Controllers\Api\VendorRegisterController::class, 'setup']);
 Route::post('vendor-registration/submit', [\App\Http\Controllers\Api\VendorRegisterController::class, 'submit']);

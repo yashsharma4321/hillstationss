@@ -10,6 +10,7 @@ class PropertySpecialDate extends Model
         'property_id',
         'date',
         'amount',
+        'is_open',
         'label',
     ];
 

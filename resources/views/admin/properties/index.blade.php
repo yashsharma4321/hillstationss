@@ -62,13 +62,19 @@
             <h2 style="font-size: 1.25rem; font-weight: 700; color: #0f172a;">Property Listings</h2>
             <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.25rem;">Manage and monitor all your rental properties in one place.</p>
         </div>
-        <a href="{{ route('admin.properties.create') }}" 
+        
+          <div style="display: flex; gap: 1rem; align-items: stretch; justify-content: flex-end;">
+              <button type="button" id="btnBulkSpecialDate" style="background: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 0.625rem; font-size: 0.875rem; font-weight: 600; border: none; cursor: pointer; display: none; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); transition: all 0.2s; align-items: center; justify-content: center;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 8px -1px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 6px -1px rgba(16, 185, 129, 0.2)'" onclick="openBulkModal()">
+                 + Add Special Date
+              </button>
+              <a href="{{ route('admin.properties.create') }}"  
            style="background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 0.625rem; text-decoration: none; font-size: 0.875rem; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(99, 102, 241, 0.2); transition: all 0.2s;"
            onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 8px -1px rgba(99, 102, 241, 0.3)';"
            onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 6px -1px rgba(99, 102, 241, 0.2)';">
            + New Property
-        </a>
-    </div>
+          </a>
+          </div>
+      </div>
 
     @if(session('success'))
         <div style="margin: 1.5rem; padding: 1rem; background: #ecfdf5; color: #065f46; border-radius: 0.5rem; border: 1px solid #a7f3d0; display: flex; align-items: center; gap: 0.75rem;">
@@ -77,12 +83,13 @@
         </div>
     @endif
 
-    <div style="padding: 0 1.5rem 1.5rem 1.5rem;">
+    <div id="listView" style="padding: 0 1.5rem 1.5rem 1.5rem;">
         <div style="overflow-x: auto; border: 1px solid var(--border); border-radius: 0.75rem;">
             <table style="min-width: 1000px;">
                 <thead>
                     <tr style="background: #f8fafc;">
-                        <th style="border-bottom: 1px solid var(--border); width: 40%;">Property Details</th>
+                        <th style="width: 40px; text-align: center; border-bottom: 1px solid var(--border);"><input type="checkbox" id="selectAllProps"></th>
+                          <th style="border-bottom: 1px solid var(--border); width: 40%;">Property Details</th>
                         <th style="border-bottom: 1px solid var(--border);">Location</th>
                         <th style="border-bottom: 1px solid var(--border);">Vendor/Category</th>
                         <th style="border-bottom: 1px solid var(--border);">Status</th>
@@ -93,7 +100,8 @@
                 <tbody>
                     @forelse($properties as $property)
                         <tr class="property-card">
-                            <td style="padding: 1.25rem 1.5rem;">
+                              <td style="padding: 1.25rem; text-align: center;"><input type="checkbox" class="property-checkbox" value="{{ $property->id }}"></td>
+                              <td style="padding: 1.25rem 1.5rem;">
                                 <div style="display: flex; align-items: center; gap: 1rem;">
                                     @if(!empty($property->gallery) && isset($property->gallery[0]))
                                         <img src="{{ Storage::url(is_array($property->gallery[0]) ? ($property->gallery[0]['image'] ?? '') : $property->gallery[0]) }}" 
@@ -149,9 +157,11 @@
                                        style="width:auto; padding:0 0.6rem; gap:0.3rem; font-size:0.72rem; font-weight:700; color:#4338ca; border-color:#c7d2fe; background:#eef2ff;">
                                         🛏 {{ $property->rooms()->count() }}
                                     </a>
+          </div>
                                     <a href="{{ route('admin.properties.edit', $property) }}" class="action-btn" title="Edit Property">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
                                     </a>
+          </div>
                                     <form action="{{ route('admin.properties.destroy', $property) }}" method="POST" onsubmit="return confirm('Delete this property?');" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
@@ -170,7 +180,12 @@
                                 </div>
                                 <h3 style="font-weight: 600; color: #475569;">No properties found</h3>
                                 <p style="color: #94a3b8; font-size: 0.875rem; margin-top: 0.5rem;">Start by adding your first villa listing to shown here.</p>
-                                <a href="{{ route('admin.properties.create') }}" style="display: inline-block; margin-top: 1.5rem; color: var(--primary); font-weight: 600; text-decoration: none;">+ Add your first property</a>
+                                
+          <div style="display: flex; gap: 1rem;">
+              <button type="button" id="btnBulkSpecialDate" style="background: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 0.625rem; font-size: 0.875rem; font-weight: 600; border: none; cursor: pointer; display: none;" onclick="openBulkModal()">
+                 + Add Special Date
+              </button>
+              <a href="{{ route('admin.properties.create') }}"  style="display: inline-block; margin-top: 1.5rem; color: var(--primary); font-weight: 600; text-decoration: none;">+ Add your first property</a>
                             </td>
                         </tr>
                     @endforelse
@@ -185,5 +200,183 @@
         @endif
     </div>
 </div>
+
+
+
+
+
+<!-- Full Page Calendar View -->
+<div id="calendarView" style="display: none; background: #fff; border-radius: 12px; overflow: hidden;">
+    <div style="display: flex; height: 100%; min-height: 80vh;">
+        <!-- Left Side: Calendar Placeholder (Visual) -->
+        <div style="flex: 1; padding: 2rem; border-right: 1px solid #e2e8f0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: #0f172a;" id="calMonthLabel">Calendar (Visual Reference)</h2>
+                <div style="display: flex; gap: 0.5rem;">
+                    <button style="padding: 0.5rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">&lt;</button>
+                    <button style="padding: 0.5rem 1rem; border: 1px solid #e2e8f0; border-radius: 8px; background: #f8fafc;">&gt;</button>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; gap: 1px; background: #e2e8f0; border: 1px solid #e2e8f0;">
+                <div style="background: #f8fafc; padding: 1rem; font-weight: 600;">Sun</div>
+                <div style="background: #f8fafc; padding: 1rem; font-weight: 600;">Mon</div>
+                <div style="background: #f8fafc; padding: 1rem; font-weight: 600;">Tue</div>
+                <div style="background: #f8fafc; padding: 1rem; font-weight: 600;">Wed</div>
+                <div style="background: #f8fafc; padding: 1rem; font-weight: 600;">Thu</div>
+                <div style="background: #f8fafc; padding: 1rem; font-weight: 600;">Fri</div>
+                <div style="background: #f8fafc; padding: 1rem; font-weight: 600;">Sat</div>
+                
+                
+                <script>
+                    function renderRealCalendarBulk() {
+                        const now = new Date();
+                        const year = now.getFullYear();
+                        const month = now.getMonth();
+                        const firstDay = new Date(year, month, 1).getDay();
+                        const daysInMonth = new Date(year, month + 1, 0).getDate();
+                        
+                        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                        document.getElementById('calMonthLabel').innerText = monthNames[month] + ' ' + year;
+
+                        let html = '';
+                        // Fill empty slots
+                        for (let i = 0; i < firstDay; i++) {
+                            html += '<div style="background: #f8fafc; padding: 1.5rem; min-height: 100px;"></div>';
+                        }
+                        
+                        // Fill actual days
+                        for (let i = 1; i <= daysInMonth; i++) {
+                            const dateStr = year + '-' + String(month + 1).padStart(2, '0') + '-' + String(i).padStart(2, '0');
+                            html += '<div style="background: white; padding: 1.5rem; min-height: 100px; text-align: left; font-size: 1.1rem; color: #64748b; cursor: pointer;" onclick="document.querySelector(\'input[name=from_date]\').value=\''+dateStr+'\'; document.querySelector(\'input[name=to_date]\').value=\''+dateStr+'\';">' + i + '</div>';
+                        }
+                        
+                        // Fill remaining slots
+                        const totalSlots = firstDay + daysInMonth;
+                        const remaining = (Math.ceil(totalSlots / 7) * 7) - totalSlots;
+                        for (let i = 0; i < remaining; i++) {
+                            html += '<div style="background: #f8fafc; padding: 1.5rem; min-height: 100px;"></div>';
+                        }
+                        
+                        document.getElementById('realCalendarGridBulk').innerHTML = html;
+                    }
+                    document.addEventListener('DOMContentLoaded', renderRealCalendarBulk);
+                </script>
+                <div id="realCalendarGridBulk" style="display: contents;"></div>
+    
+            </div>
+        </div>
+
+        <!-- Right Side: Sidebar -->
+        <div style="width: 350px; background: #fff; padding: 1.5rem; display: flex; flex-direction: column;">
+            <div style="text-align: right; margin-bottom: 1.5rem;">
+                <button onclick="closeBulkModal()" style="background: transparent; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b;">&times;</button>
+            </div>
+            
+            <h3 style="font-size: 1.25rem; margin-bottom: 1.5rem; font-weight: 700;">1 date selected</h3>
+            
+            <form id="bulkSpecialDateForm" style="flex: 1; display: flex; flex-direction: column; gap: 1.5rem;">
+                @csrf
+                <div>
+                    <label style="font-size: 0.875rem; font-weight: 600; color: #475569; display: block; margin-bottom: 0.5rem;">Start date</label>
+                    <input type="date" name="from_date" required style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; background: #f8fafc;">
+                </div>
+                
+                <div>
+                    <label style="font-size: 0.875rem; font-weight: 600; color: #475569; display: block; margin-bottom: 0.5rem;">End date</label>
+                    <input type="date" name="to_date" required style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; background: #f8fafc;">
+                </div>
+
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+                    <label style="font-size: 0.875rem; font-weight: 600; color: #475569; display: block; margin-bottom: 0.75rem;">Advanced date selection</label>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <label style="font-size: 0.875rem;"><input type="checkbox" name="days[]" value="1" checked> Mon</label>
+                        <label style="font-size: 0.875rem;"><input type="checkbox" name="days[]" value="2" checked> Tue</label>
+                        <label style="font-size: 0.875rem;"><input type="checkbox" name="days[]" value="3" checked> Wed</label>
+                        <label style="font-size: 0.875rem;"><input type="checkbox" name="days[]" value="4" checked> Thu</label>
+                        <label style="font-size: 0.875rem;"><input type="checkbox" name="days[]" value="5" checked> Fri</label>
+                        <label style="font-size: 0.875rem;"><input type="checkbox" name="days[]" value="6" checked> Sat</label>
+                        <label style="font-size: 0.875rem;"><input type="checkbox" name="days[]" value="0" checked> Sun</label>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+                    <label style="font-size: 0.875rem; font-weight: 600; color: #475569; display: block; margin-bottom: 0.75rem;">Open or close for bookings</label>
+                    <div style="display: flex; gap: 1rem;">
+                        <label style="font-size: 0.875rem;"><input type="radio" name="is_open" value="1" checked> Open</label>
+                        <label style="font-size: 0.875rem;"><input type="radio" name="is_open" value="0"> Closed</label>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="font-size: 0.875rem; font-weight: 600; color: #475569; display: block; margin-bottom: 0.5rem;">Price (INR)</label>
+                    <input type="number" name="amount" style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; background: #f8fafc;">
+                </div>
+
+                <div style="margin-top: auto; display: flex; gap: 1rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
+                    <button type="button" onclick="closeBulkModal()" style="flex: 1; padding: 0.75rem; background: #f1f5f9; color: #475569; font-weight: 600; border: 1px solid #cbd5e1; border-radius: 0.5rem; cursor: pointer;">Cancel</button>
+                    <button type="submit" style="flex: 1; padding: 0.75rem; background: #3b82f6; color: white; font-weight: 600; border: none; border-radius: 0.5rem; cursor: pointer;">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const selectAllProps = document.getElementById('selectAllProps');
+    const propertyCheckboxes = document.querySelectorAll('.property-checkbox');
+    const btnBulkSpecialDate = document.getElementById('btnBulkSpecialDate');
+
+    function toggleBulkBtn() {
+        const anyChecked = Array.from(propertyCheckboxes).some(cb => cb.checked);
+        btnBulkSpecialDate.style.display = anyChecked ? 'inline-block' : 'none';
+    }
+
+    if(selectAllProps) {
+        selectAllProps.addEventListener('change', function() {
+            propertyCheckboxes.forEach(cb => cb.checked = this.checked);
+            toggleBulkBtn();
+        });
+    }
+
+    propertyCheckboxes.forEach(cb => cb.addEventListener('change', toggleBulkBtn));
+
+    function openBulkModal() {
+        document.getElementById('listView').style.display = 'none';
+        document.getElementById('calendarView').style.display = 'block';
+    }
+
+    function closeBulkModal() {
+        document.getElementById('calendarView').style.display = 'none';
+        document.getElementById('listView').style.display = 'block';
+    }
+
+    document.getElementById('bulkSpecialDateForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const selectedIds = Array.from(propertyCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
+        if(selectedIds.length === 0) return alert('Select properties first.');
+
+        const formData = new FormData(this);
+        selectedIds.forEach(id => formData.append('property_ids[]', id));
+
+        fetch('{{ route("admin.properties.bulk_special_dates") }}', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                alert(data.message);
+                window.location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Validation failed'));
+            }
+        })
+        .catch(err => alert('Network error occurred.'));
+    });
+</script>
 @endsection
 

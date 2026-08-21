@@ -78,6 +78,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::get('settings', [\App\Http\Controllers\Admin\SettingController::class, 'index'])->name('admin.settings.index');
     Route::post('settings', [\App\Http\Controllers\Admin\SettingController::class, 'update'])->name('admin.settings.update');
 
+    Route::post('properties/bulk-special-dates', [\App\Http\Controllers\Admin\PropertyController::class, 'bulkAddSpecialDates'])->name('admin.properties.bulk_special_dates');
     Route::delete('properties/image/{property}', [\App\Http\Controllers\Admin\PropertyController::class, 'deleteImage'])->name('admin.properties.image.delete');
     
     // Room Management
