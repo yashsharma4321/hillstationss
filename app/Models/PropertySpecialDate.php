@@ -12,6 +12,7 @@ class PropertySpecialDate extends Model
         'amount',
         'is_open',
         'label',
+        'type',
     ];
 
     protected $casts = [

@@ -160,8 +160,16 @@
 
 <div class="calendar-container">
     <div class="calendar-sidebar">
-        <h3 style="font-size: 1.1rem; color: #1e293b; margin-bottom: 1.25rem;">Set Pricing</h3>
+        <h3 style="font-size: 1.1rem; color: #1e293b; margin-bottom: 1.25rem;">Set Pricing / Status</h3>
         
+        <div class="form-group">
+            <label class="form-label">Select Type</label>
+            <select id="special_type" class="form-input">
+                <option value="special_price">Special Date Price</option>
+                <option value="maintenance">Maintenance Mode</option>
+            </select>
+        </div>
+
         <div class="form-group">
             <label class="form-label">Select Date Range</label>
             <input type="text" id="special_date_range" class="form-input" placeholder="Select dates..." readonly>
@@ -177,7 +185,7 @@
             <input type="text" id="special_to_date" class="form-input" readonly>
         </div>
         
-        <div class="form-group">
+        <div class="form-group" id="special_amount_group">
             <label class="form-label">Amount (₹) <span style="color:#ef4444">*</span></label>
             <input type="number" id="special_amount" class="form-input" min="0" step="0.01" placeholder="e.g. 15000">
         </div>
@@ -274,8 +282,22 @@
         });
         calendar.render();
 
+        // Type Change dynamic toggle
+        const typeSelect = document.getElementById('special_type');
+        const amountGroup = document.getElementById('special_amount_group');
+        if (typeSelect && amountGroup) {
+            typeSelect.addEventListener('change', function() {
+                if (this.value === 'maintenance') {
+                    amountGroup.style.display = 'none';
+                } else {
+                    amountGroup.style.display = 'block';
+                }
+            });
+        }
+
         // AJAX Save
         document.getElementById('btn_save_special_dates')?.addEventListener('click', async function() {
+            const type = document.getElementById('special_type').value;
             const fromDate = document.getElementById('special_from_date').value;
             const toDate = document.getElementById('special_to_date').value;
             const amount = document.getElementById('special_amount').value;
@@ -288,7 +310,7 @@
                 feedback.innerHTML = '<span style="color:#dc2626;">Please select a date range.</span>';
                 return;
             }
-            if (!amount) {
+            if (type === 'special_price' && !amount) {
                 feedback.innerHTML = '<span style="color:#dc2626;">Please enter an amount.</span>';
                 return;
             }
@@ -310,10 +332,11 @@
                     body: JSON.stringify({ 
                         from_date: fromDate, 
                         to_date: toDate, 
-                        amount: amount, 
+                        amount: type === 'maintenance' ? 0 : amount, 
                         label: label,
                         days: selectedDays,
-                        is_open: 1 
+                        is_open: type === 'maintenance' ? 0 : 1,
+                        type: type
                     })
                 });
 

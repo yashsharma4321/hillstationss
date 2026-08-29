@@ -466,16 +466,18 @@ class PropertyController extends Controller
         $request->validate([
             'from_date' => 'required|date',
             'to_date' => 'required|date|after_or_equal:from_date',
-            'amount' => 'required|numeric|min:0',
+            'amount' => 'required_if:type,special_price|nullable|numeric|min:0',
             'label' => 'nullable|string|max:255',
-            'is_open' => 'nullable|boolean'
+            'is_open' => 'nullable|boolean',
+            'type' => 'required|in:special_price,maintenance',
         ]);
 
         $fromDate = \Carbon\Carbon::parse($request->from_date);
         $toDate = \Carbon\Carbon::parse($request->to_date);
-        $amount = $request->amount;
-        $label = $request->label;
-        $isOpen = $request->has('is_open') ? $request->is_open : 1;
+        $type = $request->input('type', 'special_price');
+        $isOpen = ($type === 'maintenance') ? 0 : 1;
+        $amount = ($type === 'maintenance') ? 0 : ($request->amount ?? 0);
+        $label = ($type === 'maintenance' && empty($request->label)) ? 'Maintenance' : $request->label;
         $days = $request->input('days', []); // Array of day numbers (0 for Sunday, 6 for Saturday)
 
         $datesToProcess = [];
@@ -519,7 +521,7 @@ class PropertyController extends Controller
         if (!empty($conflicts)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Cannot add special pricing. The following date(s) already have bookings: ' . implode(', ', $conflicts)
+                'message' => 'Cannot add special pricing/maintenance. The following date(s) already have bookings: ' . implode(', ', $conflicts)
             ], 422);
         }
 
@@ -527,14 +529,14 @@ class PropertyController extends Controller
         foreach ($datesToProcess as $dateStr) {
             $sd = $property->specialDates()->updateOrCreate(
                 ['date' => $dateStr],
-                ['amount' => $amount, 'is_open' => $isOpen, 'label' => $label]
+                ['amount' => $amount, 'is_open' => $isOpen, 'label' => $label, 'type' => $type]
             );
             $addedDates[] = $sd;
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Special dates added successfully.',
+            'message' => $type === 'maintenance' ? 'Maintenance dates added successfully.' : 'Special dates added successfully.',
             'dates' => $addedDates
         ]);
     }
@@ -578,20 +580,30 @@ class PropertyController extends Controller
 
         foreach ($specialDates as $sd) {
             $dateStr = $sd->date->format('Y-m-d');
-            $title = 'Available ₹' . number_format($sd->amount, 0);
-            if (!$sd->is_open) {
-                $title = 'Closed';
-            }
-            if ($sd->label) {
-                $title .= ' (' . $sd->label . ')';
+            $isMaintenance = ($sd->type === 'maintenance') || (!$sd->is_open);
+
+            if ($isMaintenance) {
+                $title = 'Maintenance';
+                if ($sd->label) {
+                    $title .= ' (' . $sd->label . ')';
+                }
+                $color = '#fecaca'; // red background for maintenance
+                $textColor = '#991b1b';
+            } else {
+                $title = 'Available ₹' . number_format($sd->amount, 0);
+                if ($sd->label) {
+                    $title .= ' (' . $sd->label . ')';
+                }
+                $color = '#e0e7ff'; // indigo for special price
+                $textColor = '#4338ca';
             }
 
             $events[$dateStr] = [
                 'title' => $title,
                 'start' => $dateStr,
                 'display' => 'background',
-                'color' => $sd->is_open ? '#e0e7ff' : '#fee2e2',
-                'textColor' => $sd->is_open ? '#4338ca' : '#b91c1c',
+                'color' => $color,
+                'textColor' => $textColor,
                 'amount' => $sd->amount
             ];
         }
