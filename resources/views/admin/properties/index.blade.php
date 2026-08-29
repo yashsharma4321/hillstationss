@@ -64,7 +64,7 @@
         </div>
         
           <div style="display: flex; gap: 1rem; align-items: stretch; justify-content: flex-end;">
-              <button type="button" id="btnBulkSpecialDate" style="background: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 0.625rem; font-size: 0.875rem; font-weight: 600; border: none; cursor: pointer; display: none; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); transition: all 0.2s; align-items: center; justify-content: center;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 8px -1px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 6px -1px rgba(16, 185, 129, 0.2)'" onclick="openBulkModal()">
+              <button type="button" id="btnBulkSpecialDate" style="background: #10b981; color: white; padding: 0.75rem 1.5rem; border-radius: 0.625rem; font-size: 0.875rem; font-weight: 600; border: none; cursor: pointer; display: inline-flex; box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2); transition: all 0.2s; align-items: center; justify-content: center;" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 8px -1px rgba(16, 185, 129, 0.3)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 6px -1px rgba(16, 185, 129, 0.2)'" onclick="openBulkModal()">
                  + Add Special Date
               </button>
               <a href="{{ route('admin.properties.create') }}"  
@@ -88,7 +88,6 @@
             <table style="min-width: 1000px;">
                 <thead>
                     <tr style="background: #f8fafc;">
-                        <th style="width: 40px; text-align: center; border-bottom: 1px solid var(--border);"><input type="checkbox" id="selectAllProps"></th>
                           <th style="border-bottom: 1px solid var(--border); width: 40%;">Property Details</th>
                         <th style="border-bottom: 1px solid var(--border);">Location</th>
                         <th style="border-bottom: 1px solid var(--border);">Vendor/Category</th>
@@ -100,7 +99,6 @@
                 <tbody>
                     @forelse($properties as $property)
                         <tr class="property-card">
-                              <td style="padding: 1.25rem; text-align: center;"><input type="checkbox" class="property-checkbox" value="{{ $property->id }}"></td>
                               <td style="padding: 1.25rem 1.5rem;">
                                 <div style="display: flex; align-items: center; gap: 1rem;">
                                     @if(!empty($property->gallery) && isset($property->gallery[0]))
@@ -150,18 +148,16 @@
                                 @endif
                             </td>
                             <td style="padding: 1.25rem 1.5rem; text-align: right;">
-                                <div style="display: inline-flex; gap: 0.5rem; align-items: center;">
+                                <div style="display: inline-flex; gap: 0.5rem; align-items: center; justify-content: flex-end;">
                                     {{-- Rooms Button --}}
                                     <a href="{{ route('admin.properties.rooms.index', $property) }}"
                                        class="action-btn" title="Manage Rooms"
-                                       style="width:auto; padding:0 0.6rem; gap:0.3rem; font-size:0.72rem; font-weight:700; color:#4338ca; border-color:#c7d2fe; background:#eef2ff;">
+                                       style="width:auto; padding:0 0.6rem; gap:0.3rem; font-size:0.72rem; font-weight:700; color:#4338ca; border-color:#c7d2fe; background:#eef2ff; text-decoration:none;">
                                         🛏 {{ $property->rooms()->count() }}
                                     </a>
-          </div>
                                     <a href="{{ route('admin.properties.edit', $property) }}" class="action-btn" title="Edit Property">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
                                     </a>
-          </div>
                                     <form action="{{ route('admin.properties.destroy', $property) }}" method="POST" onsubmit="return confirm('Delete this property?');" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
@@ -169,6 +165,12 @@
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
                                         </button>
                                     </form>
+                                    {{-- Calendar Button --}}
+                                    <a href="{{ route('admin.properties.calendar', $property) }}"
+                                       class="action-btn" title="Open Calendar"
+                                       style="color:#0284c7; border-color:#bae6fd; background:#f0f9ff; text-decoration:none;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -278,6 +280,16 @@
             <form id="bulkSpecialDateForm" style="flex: 1; display: flex; flex-direction: column; gap: 1.5rem;">
                 @csrf
                 <div>
+                    <label style="font-size: 0.875rem; font-weight: 600; color: #475569; display: block; margin-bottom: 0.5rem;">Select Properties <span style="color:#ef4444">*</span></label>
+                    <select name="property_ids[]" multiple required style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; background: #f8fafc; height: 120px; font-size: 0.875rem;">
+                        @foreach($properties as $prop)
+                            <option value="{{ $prop->id }}">{{ $prop->name }}</option>
+                        @endforeach
+                    </select>
+                    <span style="font-size: 0.72rem; color: #64748b; margin-top: 0.25rem; display: block;">Hold Ctrl (or Cmd on Mac) to select multiple.</span>
+                </div>
+                
+                <div>
                     <label style="font-size: 0.875rem; font-weight: 600; color: #475569; display: block; margin-bottom: 0.5rem;">Start date</label>
                     <input type="date" name="from_date" required style="width: 100%; padding: 0.75rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; background: #f8fafc;">
                 </div>
@@ -323,24 +335,6 @@
 </div>
 
 <script>
-    const selectAllProps = document.getElementById('selectAllProps');
-    const propertyCheckboxes = document.querySelectorAll('.property-checkbox');
-    const btnBulkSpecialDate = document.getElementById('btnBulkSpecialDate');
-
-    function toggleBulkBtn() {
-        const anyChecked = Array.from(propertyCheckboxes).some(cb => cb.checked);
-        btnBulkSpecialDate.style.display = anyChecked ? 'inline-block' : 'none';
-    }
-
-    if(selectAllProps) {
-        selectAllProps.addEventListener('change', function() {
-            propertyCheckboxes.forEach(cb => cb.checked = this.checked);
-            toggleBulkBtn();
-        });
-    }
-
-    propertyCheckboxes.forEach(cb => cb.addEventListener('change', toggleBulkBtn));
-
     function openBulkModal() {
         document.getElementById('listView').style.display = 'none';
         document.getElementById('calendarView').style.display = 'block';
@@ -353,11 +347,7 @@
 
     document.getElementById('bulkSpecialDateForm').addEventListener('submit', function(e) {
         e.preventDefault();
-        const selectedIds = Array.from(propertyCheckboxes).filter(cb => cb.checked).map(cb => cb.value);
-        if(selectedIds.length === 0) return alert('Select properties first.');
-
         const formData = new FormData(this);
-        selectedIds.forEach(id => formData.append('property_ids[]', id));
 
         fetch('{{ route("admin.properties.bulk_special_dates") }}', {
             method: 'POST',

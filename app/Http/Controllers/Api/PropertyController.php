@@ -299,6 +299,8 @@ class PropertyController extends Controller
                     'date'   => $sd->date->format('Y-m-d'),
                     'amount' => $sd->amount,
                     'label'  => $sd->label,
+                    'is_open'=> $sd->is_open,
+                    'type'   => $sd->type ?? 'special_price'
                 ]),
             'category' => [
                 'id' => $property->category->id ?? null,
