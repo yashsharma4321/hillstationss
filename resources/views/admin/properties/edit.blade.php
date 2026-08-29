@@ -1239,9 +1239,15 @@
 
     <!-- SPECIAL DATES (Weekend / Holiday Pricing) -->
     <div class="form-section">
-        <h3 class="section-title">
-            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-            Special Date Pricing
+        <h3 class="section-title" style="justify-content: space-between; width: 100%;">
+            <span style="display: flex; align-items: center; gap: 0.75rem;">
+                <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Special Date Pricing
+            </span>
+            <a href="{{ route('admin.properties.calendar', $property) }}" class="btn-add-primary" style="margin-top: 0; width: auto; font-size: 0.8rem; padding: 0.45rem 1.1rem; display: inline-flex; align-items: center; gap: 0.5rem;">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Open Calendar View
+            </a>
         </h3>
         <p style="color:#64748b; font-size:0.875rem; margin-bottom:1.5rem;">Weekend ya holiday par alag price set karo. Yeh price API mein <code>special_dates</code> field mein ayega.</p>
 

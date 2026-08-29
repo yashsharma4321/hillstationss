@@ -282,6 +282,37 @@ class PropertyController extends Controller
         $mealIds = \App\Models\Meal::whereIn('name', $mealNames)->pluck('id');
         $property->mealTypes()->sync($mealIds);
 
+        // Validate special dates against active bookings
+        $specialDatesInput = $request->input('special_dates', []);
+        if (!empty($specialDatesInput)) {
+            $overlappingBookings = \App\Models\Booking::where('property_id', $property->id)
+                ->where('status', '!=', 'cancelled')
+                ->get();
+            $bookedDates = [];
+            foreach ($overlappingBookings as $b) {
+                $checkIn = \Carbon\Carbon::parse($b->check_in);
+                $checkOut = \Carbon\Carbon::parse($b->check_out);
+                for ($d = $checkIn->copy(); $d->lt($checkOut); $d->addDay()) {
+                    $bookedDates[$d->format('Y-m-d')] = true;
+                }
+            }
+
+            $conflicts = [];
+            foreach ($specialDatesInput as $sd) {
+                if (empty($sd['date'])) continue;
+                $formattedDate = \Carbon\Carbon::parse($sd['date'])->format('Y-m-d');
+                if (isset($bookedDates[$formattedDate])) {
+                    $conflicts[] = $formattedDate;
+                }
+            }
+
+            if (!empty($conflicts)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['special_dates' => 'Cannot set special pricing for date(s) with active bookings: ' . implode(', ', $conflicts)]);
+            }
+        }
+
         // Handle Special Dates
         $property->specialDates()->delete();
         foreach ($request->input('special_dates', []) as $sd) {
@@ -381,23 +412,53 @@ class PropertyController extends Controller
         $isOpen = $request->is_open;
 
         $datesToAdd = [];
-        for ($date = $fromDate; $date->lte($toDate); $date->addDay()) {
+        for ($date = $fromDate->copy(); $date->lte($toDate); $date->addDay()) {
             // Carbon dayOfWeek returns 0 (Sun) to 6 (Sat)
             if (in_array($date->dayOfWeek, $days)) {
                 $datesToAdd[] = $date->format('Y-m-d');
             }
         }
 
+        $skippedCount = 0;
+        $addedCount = 0;
+
         foreach ($properties as $property) {
+            // Fetch bookings overlapping this date range for this property
+            $bookings = \App\Models\Booking::where('property_id', $property->id)
+                ->where('status', '!=', 'cancelled')
+                ->where('check_in', '<', $toDate->copy()->addDay()->format('Y-m-d'))
+                ->where('check_out', '>', $fromDate->format('Y-m-d'))
+                ->get();
+
+            $bookedDays = [];
+            foreach ($bookings as $b) {
+                $checkIn = \Carbon\Carbon::parse($b->check_in);
+                $checkOut = \Carbon\Carbon::parse($b->check_out);
+                for ($d = $checkIn->copy(); $d->lt($checkOut); $d->addDay()) {
+                    $bookedDays[$d->format('Y-m-d')] = true;
+                }
+            }
+
             foreach ($datesToAdd as $dateStr) {
+                if (isset($bookedDays[$dateStr])) {
+                    $skippedCount++;
+                    continue;
+                }
+
                 $property->specialDates()->updateOrCreate(
                     ['date' => $dateStr],
                     ['amount' => $amount, 'is_open' => $isOpen]
                 );
+                $addedCount++;
             }
         }
 
-        return response()->json(['success' => true, 'message' => 'Special dates added successfully.']);
+        $message = "Special dates updated successfully.";
+        if ($skippedCount > 0) {
+            $message .= " (Skipped {$skippedCount} date(s) due to existing bookings)";
+        }
+
+        return response()->json(['success' => true, 'message' => $message]);
     }
 
     public function ajaxAddSpecialDates(\Illuminate\Http\Request $request, Property $property)
@@ -417,15 +478,53 @@ class PropertyController extends Controller
         $isOpen = $request->has('is_open') ? $request->is_open : 1;
         $days = $request->input('days', []); // Array of day numbers (0 for Sunday, 6 for Saturday)
 
-        $addedDates = [];
-
-        for ($date = $fromDate; $date->lte($toDate); $date->addDay()) {
-            // If days array is provided, only process if the day of week is in the array
+        $datesToProcess = [];
+        for ($date = $fromDate->copy(); $date->lte($toDate); $date->addDay()) {
             if (!empty($days) && !in_array($date->dayOfWeek, $days)) {
                 continue;
             }
+            $datesToProcess[] = $date->format('Y-m-d');
+        }
 
-            $dateStr = $date->format('Y-m-d');
+        if (empty($datesToProcess)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No dates selected to update.'
+            ], 422);
+        }
+
+        // Fetch bookings overlapping this date range
+        $bookings = \App\Models\Booking::where('property_id', $property->id)
+            ->where('status', '!=', 'cancelled')
+            ->where('check_in', '<', $toDate->copy()->addDay()->format('Y-m-d'))
+            ->where('check_out', '>', $fromDate->format('Y-m-d'))
+            ->get();
+
+        $bookedDays = [];
+        foreach ($bookings as $b) {
+            $checkIn = \Carbon\Carbon::parse($b->check_in);
+            $checkOut = \Carbon\Carbon::parse($b->check_out);
+            for ($d = $checkIn->copy(); $d->lt($checkOut); $d->addDay()) {
+                $bookedDays[$d->format('Y-m-d')] = true;
+            }
+        }
+
+        $conflicts = [];
+        foreach ($datesToProcess as $dateStr) {
+            if (isset($bookedDays[$dateStr])) {
+                $conflicts[] = $dateStr;
+            }
+        }
+
+        if (!empty($conflicts)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot add special pricing. The following date(s) already have bookings: ' . implode(', ', $conflicts)
+            ], 422);
+        }
+
+        $addedDates = [];
+        foreach ($datesToProcess as $dateStr) {
             $sd = $property->specialDates()->updateOrCreate(
                 ['date' => $dateStr],
                 ['amount' => $amount, 'is_open' => $isOpen, 'label' => $label]
@@ -499,20 +598,21 @@ class PropertyController extends Controller
 
         // 3. Bookings
         $bookings = $property->bookings()
+            ->with('customer')
             ->where('status', '!=', 'cancelled')
-            ->where(function ($query) use ($startDate, $endDate) {
-                $query->whereBetween('check_in', [$startDate, $endDate])
-                      ->orWhereBetween('check_out', [$startDate, $endDate]);
-            })->get();
+            ->where('check_in', '<', $endDate->format('Y-m-d'))
+            ->where('check_out', '>', $startDate->format('Y-m-d'))
+            ->get();
 
         $bookingEvents = [];
         foreach ($bookings as $booking) {
             $bookingEvents[] = [
-                'title' => $booking->customer_name ?? 'Booked',
-                'start' => $booking->check_in,
-                'end' => $booking->check_out, // exclusive in FullCalendar
+                'title' => ($booking->customer ? $booking->customer->name : 'Booked'),
+                'start' => $booking->check_in->format('Y-m-d'),
+                'end' => $booking->check_out->format('Y-m-d'), // exclusive in FullCalendar
                 'color' => '#3b82f6',
-                'textColor' => '#ffffff'
+                'textColor' => '#ffffff',
+                'url' => route('admin.bookings.show', $booking),
             ];
         }
 

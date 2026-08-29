@@ -37,6 +37,16 @@
 
 @section('content')
 <div style="max-width: 1100px; margin: 0 auto;">
+    @if ($errors->any())
+        <div style="margin-bottom: 2rem; padding: 1.5rem; background: #fee2e2; border: 1.5px solid #fecaca; border-radius: 0.75rem; color: #991b1b;">
+            <ul style="margin: 0; padding-left: 1.25rem; font-size: 0.9rem;">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     <form action="{{ route('vendor.properties.update', $property) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -50,10 +60,14 @@
             <div class="form-grid">
                 <div class="form-group full-width">
                 <label class="form-label">Property Name <span style="color:var(--danger)">*</span></label>
-                <div style="display: flex; gap: 1rem;">
+                <div style="display: flex; gap: 1rem; align-items: flex-start;">
                     <input type="text" name="name" value="{{ old('name', $property->name) }}" required class="form-input" placeholder="e.g. Hilltop Villa & Suites" style="flex: 2;">
-                    <div style="flex: 1;">
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 0.5rem;">
                         <input type="number" step="0.01" name="amount" value="{{ old('amount', $property->amount) }}" class="form-input" placeholder="Amount / Price">
+                        <a href="{{ route('vendor.properties.calendar', $property) }}" class="btn-add" style="margin-top: 0; padding: 0.5rem 1rem; font-size: 0.8rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; width: auto; align-self: flex-start; text-decoration: none; border: 1.5px solid var(--primary); background: transparent; color: var(--primary); box-shadow: none;">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            Manage Special Dates in Calendar
+                        </a>
                     </div>
                 </div>
                 @error('name') <p style="color:var(--danger); font-size:0.75rem; margin-top:0.25rem">{{ $message }}</p> @enderror

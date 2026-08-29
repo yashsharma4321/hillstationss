@@ -145,6 +145,17 @@
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"></path></svg>
         Back to Property Edit
     </a>
+    <div style="display: flex; gap: 1rem; align-items: center; background: white; border: 1px solid #e2e8f0; padding: 0.5rem 1rem; border-radius: var(--radius-sm); box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <span style="font-size: 0.8rem; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 0.35rem;">
+            <span style="width: 12px; height: 12px; background: #3b82f6; border-radius: 3px; display: inline-block;"></span> Bookings
+        </span>
+        <span style="font-size: 0.8rem; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 0.35rem;">
+            <span style="width: 12px; height: 12px; background: #e0e7ff; border: 1px solid #c7d2fe; border-radius: 3px; display: inline-block;"></span> Special Rates
+        </span>
+        <span style="font-size: 0.8rem; font-weight: 600; color: #475569; display: flex; align-items: center; gap: 0.35rem;">
+            <span style="width: 12px; height: 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 3px; display: inline-block;"></span> Standard Price
+        </span>
+    </div>
 </div>
 
 <div class="calendar-container">
@@ -231,11 +242,34 @@
                 center: 'title',
                 right: 'dayGridMonth'
             },
+            selectable: true,
+            dateClick: function(info) {
+                const fp = document.getElementById('special_date_range')._flatpickr;
+                if (fp) {
+                    fp.setDate([info.dateStr, info.dateStr], true);
+                    const amountInput = document.getElementById('special_amount');
+                    if (amountInput) {
+                        amountInput.focus();
+                    }
+                }
+            },
+            eventClick: function(info) {
+                if (info.event.url) {
+                    window.location.href = info.event.url;
+                    info.jsEvent.preventDefault();
+                }
+            },
             events: '{{ route('admin.properties.calendar_events', $property) }}',
             eventContent: function(arg) {
                 if (arg.event.display === 'background') {
                     return { html: '<div class="fc-bg-event-title" style="color:' + arg.event.textColor + '">' + arg.event.title + '</div>' };
                 }
+                return {
+                    html: '<div class="fc-event-title-container" style="padding: 2px 4px; font-size: 0.75rem; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: flex; align-items: center; gap: 4px; cursor: pointer; color: white;">' +
+                          '<span>📅</span>' +
+                          '<span>' + arg.event.title + '</span>' +
+                          '</div>'
+                };
             }
         });
         calendar.render();
@@ -285,12 +319,13 @@
 
                 const data = await response.json();
                 
-                if (data.success) {
+                if (response.ok && data.success) {
                     feedback.innerHTML = '<span style="color:#16a34a;">' + data.message + '</span>';
                     calendar.refetchEvents(); // Refresh calendar events on success
                     setTimeout(() => feedback.innerHTML = '', 3000);
                 } else {
-                    feedback.innerHTML = '<span style="color:#dc2626;">Error saving dates.</span>';
+                    const errMsg = data.message || 'Error saving dates.';
+                    feedback.innerHTML = '<span style="color:#dc2626;">' + errMsg + '</span>';
                 }
             } catch (error) { 
                 feedback.innerHTML = '<span style="color:#dc2626;">Failed to save. ' + error.message + '</span>';
